@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "La Rambla Ignore Users",
+  "version": "1.0",
+  "content_scripts": [
+    {
+      "matches": ["https://www.fcbarca.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
