@@ -1,12 +1,25 @@
 {
   "manifest_version": 3,
-  "name": "La Rambla Ignore Users",
-  "version": "1.0",
+  "name": "La Rambla Cleaner",
+  "version": "2.0",
+  "permissions": ["storage"],
+  "host_permissions": ["https://www.fcbarca.com/*"],
   "content_scripts": [
     {
       "matches": ["https://www.fcbarca.com/*"],
-      "js": ["content.js"],
-      "run_at": "document_idle"
+      "js": ["content.js"]
     }
-  ]
+  ],
+    "action": {
+    "default_popup": "popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "larambla-cleaner@example.com",
+      "data_collection_permissions": {
+        "required": [],
+        "optional": []
+      }
+    }
+  }
 }
