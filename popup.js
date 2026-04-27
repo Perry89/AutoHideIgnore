@@ -9,7 +9,18 @@ const categories = [
     "film",
     "muzyka"
 ];
+const ext = typeof browser !== "undefined" ? browser : chrome;
+function notifyContentScript() {
+    ext.tabs.query({ active: true, currentWindow: true }, tabs => {
+        if (!tabs[0]) return;
 
+        if (isFirefox) {
+            ext.tabs.sendMessage(tabs[0].id, { type: "updateFilters" });
+        } else {
+            ext.tabs.sendMessage(tabs[0].id, { type: "updateFilters" });
+        }
+    });
+}
 function getIgnoredCategories() {
     return new Promise(resolve => {
         chrome.storage.local.get(["ignoredCategories"], result => {
@@ -17,6 +28,11 @@ function getIgnoredCategories() {
         });
     });
 }
+ext.runtime.onMessage.addListener((msg) => {
+    if (msg.type === "updateFilters") {
+        processComments();
+    }
+});
 
 function saveIgnoredCategories(categories) {
     chrome.storage.local.set({ ignoredCategories: categories });
