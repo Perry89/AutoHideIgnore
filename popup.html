@@ -5,19 +5,38 @@
     body {
       font-family: Arial;
       padding: 10px;
-      min-width: 200px;
+      min-width: 220px;
     }
-
-    .category {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 5px;
-    }
+    .category-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  
   </style>
+  <style id="togglecss">
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+</style>
 </head>
 <body>
 
-  <h3>Ukryj Kategorie</h3>
+  <h3>Kategoryzacja</h3>
+
+<div class="toggle-row">
+  <span>Pokaz kategorie</span>
+  <input type="checkbox" id="toggleCategorization">
+</div>
+<div class="toggle-row">
+  <span>Ukryj mention ignorowanych</span>
+  <input type="checkbox" id="toggleMentionIgnore">
+</div>
+  <hr>
 
   <div id="categories"></div>
 
