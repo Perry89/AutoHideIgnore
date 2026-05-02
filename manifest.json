@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "La Rambla Cleaner",
-  "version": "1.2",
+  "version": "2.1",
 
 "permissions": ["storage", "activeTab"],
   "host_permissions": ["*://www.fcbarca.com/*"],
@@ -16,15 +16,5 @@
       "js": ["content.js"],
       "run_at": "document_idle"
     }
-  ],
-
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "larambla-cleaner@example.com",
-      "data_collection_permissions": {
-        "required": ["none"],
-        "optional": []
-      }
-    }
-  }
+  ]
 }
