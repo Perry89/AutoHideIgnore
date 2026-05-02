@@ -3,7 +3,7 @@
   "name": "La Rambla Cleaner",
   "version": "2.1",
 
-"permissions": ["storage", "activeTab"],
+"permissions": ["storage"],
   "host_permissions": ["*://www.fcbarca.com/*"],
 
   "action": {
