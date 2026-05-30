@@ -251,6 +251,17 @@ function usernameFromElement(el) {
         );
 }
 
+function usernameSearchText(value) {
+    return normalize(value)
+        .replace(/[^\w.-]+/g, " ")
+        .trim();
+}
+
+function textContainsUsername(text, username) {
+    if (!username) return false;
+    return ` ${usernameSearchText(text)} `.includes(` ${username} `);
+}
+
 function userIdFromElement(el) {
     if (!el) return "";
     const source = el.closest("[data-user-id], [user-id]") || el;
@@ -259,6 +270,10 @@ function userIdFromElement(el) {
 
 function commentAuthor(comment) {
     return comment.querySelector(COMMENT_AUTHOR_SELECTOR);
+}
+
+function commentAuthorScope(comment) {
+    return comment.querySelector(".comment__header, .comment__meta, .comment__author") || commentAuthor(comment);
 }
 
 function updateUsernameMap() {
@@ -302,6 +317,34 @@ function collectCommentAuthor(comment, target) {
     if (username) target.usernames.add(username);
     if (id) target.userIds.add(id);
     if (id && username) usernameToIdMap.set(username, id);
+}
+
+function removeVisibleCachedAuthor(comment, ignored) {
+    const scope = commentAuthorScope(comment);
+    if (!scope) return false;
+
+    let changed = false;
+    const author = commentAuthor(comment);
+    const username = usernameFromElement(author) || usernameFromElement(scope);
+    const id = userIdFromElement(author) || userIdFromElement(scope);
+
+    if (username && !ignored.usernames.has(username)) {
+        changed = deleteIgnoredUsername(username) || changed;
+        changed = deleteIgnoredUserId(usernameToIdMap.get(username)) || changed;
+    }
+
+    if (id && !ignored.userIds.has(id)) {
+        changed = deleteIgnoredUserId(id) || changed;
+    }
+
+    Array.from(ignoredUsernamesCache).forEach(cachedUsername => {
+        if (!ignored.usernames.has(cachedUsername) && textContainsUsername(scope.textContent, cachedUsername)) {
+            changed = deleteIgnoredUsername(cachedUsername) || changed;
+            changed = deleteIgnoredUserId(usernameToIdMap.get(cachedUsername)) || changed;
+        }
+    });
+
+    return changed;
 }
 
 function collectIgnoredCommentUsers(comment, target) {
@@ -350,6 +393,10 @@ function updateIgnoredUsersFromDOM() {
         if (!ignored.userIds.has(id)) {
             changed = deleteIgnoredUserId(id) || changed;
         }
+    });
+
+    document.querySelectorAll(".comment:not(.comment--ignored):not(.comment--hidden):not(.comment-hidden)").forEach(comment => {
+        changed = removeVisibleCachedAuthor(comment, ignored) || changed;
     });
 
     if (changed) saveIgnoredUsersToStorage();
@@ -429,35 +476,6 @@ function isIgnoredAuthorElement(el) {
     const username = usernameFromElement(el);
     const id = userIdFromElement(el);
     return ignoredUsernamesCache.has(username) || (id && ignoredUserIdsCache.has(id));
-}
-
-function usernameFromUserActionButton(button) {
-    const container = button.closest(".user-profile-box, .user-block, li") || button;
-    const user =
-        container.querySelector(".meta__name, .user__name, .author__name, a[href*='/user/']") ||
-        button;
-
-    return usernameFromElement(user);
-}
-
-function updateIgnoredUserFromAction(button, shouldIgnore) {
-    const id = userIdFromElement(button);
-    const username = usernameFromUserActionButton(button);
-    let changed = false;
-
-    if (shouldIgnore) {
-        changed = addIgnoredUserId(id) || changed;
-        changed = addIgnoredUsername(username) || changed;
-    } else {
-        changed = deleteIgnoredUserId(id) || changed;
-        changed = deleteIgnoredUserId(usernameToIdMap.get(username)) || changed;
-        changed = deleteIgnoredUsername(username) || changed;
-    }
-
-    if (changed) {
-        saveIgnoredUsersToStorage();
-        processComments();
-    }
 }
 
 function hideHotDiscussionsFromIgnoredUsers() {
@@ -543,17 +561,6 @@ if (document.readyState === "loading") {
 
 ext.runtime.onMessage.addListener(msg => {
     if (msg.type === "updateFilters") processComments();
-});
-
-document.addEventListener("click", event => {
-    const ignoreButton = event.target.closest(".action--ignore");
-    const unignoreButton = event.target.closest(".action--unignore");
-
-    if (ignoreButton) {
-        setTimeout(() => updateIgnoredUserFromAction(ignoreButton, true), 800);
-    } else if (unignoreButton) {
-        setTimeout(() => updateIgnoredUserFromAction(unignoreButton, false), 800);
-    }
 });
 
 let observerTimeout = null;

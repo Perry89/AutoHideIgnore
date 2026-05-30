@@ -1,6 +1,6 @@
 {
   "name": "la-rambla-cleaner-firefox",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "Firefox extension for hiding ignored users and filtering fcbarca.com comment categories.",
   "private": true,
   "scripts": {
