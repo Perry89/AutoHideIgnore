@@ -13,7 +13,7 @@ let ignoredUserIdsCache = new Set();
 let ignoredUsernamesCache = new Set();
 let usernameToIdMap = new Map();
 
-const SITE_IGNORED_COMMENT_SELECTOR = ".comment--ignored, .comment--hidden, .comment-hidden";
+const SITE_IGNORED_COMMENT_SELECTOR = ".comment--ignored, .comment--hidden, .comment-hidden, .comment[class*='ignored']";
 const HOT_DISCUSSION_SELECTOR = [
     "a.item[href*='/la-rambla/dyskusja-']",
     ".hot-discussions a[href*='/la-rambla/dyskusja-']",
@@ -282,6 +282,15 @@ function isSiteIgnoredComment(comment) {
         headerText.includes("komentarz uzytkownika");
 }
 
+function normalCommentContainsUsername(comment, username) {
+    if (!username || isSiteIgnoredComment(comment)) return false;
+
+    const authorScope = commentAuthorScope(comment);
+    if (authorScope && textContainsUsername(authorScope.textContent, username)) return true;
+
+    return textContainsUsername(comment.textContent, username);
+}
+
 function updateUsernameMap() {
     document.querySelectorAll(".mentioned-user").forEach(el => {
         const id = el.getAttribute("user-id");
@@ -362,7 +371,7 @@ function removeVisibleCachedAuthor(comment, ignored) {
     }
 
     Array.from(ignoredUsernamesCache).forEach(cachedUsername => {
-        if (!ignored.usernames.has(cachedUsername) && textContainsUsername(scope.textContent, cachedUsername)) {
+        if (!ignored.usernames.has(cachedUsername) && normalCommentContainsUsername(comment, cachedUsername)) {
             changed = deleteIgnoredUsername(cachedUsername) || changed;
             changed = deleteIgnoredUserId(usernameToIdMap.get(cachedUsername)) || changed;
         }
@@ -480,12 +489,6 @@ function addCategoryLabel(comment, category) {
     }
 }
 
-function isIgnoredMention(el) {
-    const id = el.getAttribute("user-id");
-    const username = usernameFromElement(el);
-    return (id && ignoredUserIdsCache.has(String(id))) || ignoredUsernamesCache.has(username);
-}
-
 function isIgnoredAuthorElement(el) {
     const username = usernameFromElement(el);
     const id = userIdFromElement(el);
@@ -517,9 +520,8 @@ async function processComments() {
         updateIgnoredUsersFromDOM();
         removeIgnoredComments();
 
-        const [enabled, mentionEnabled, ignoredCategories] = await Promise.all([
+        const [enabled, ignoredCategories] = await Promise.all([
             getCategorizationEnabled(),
-            getMentionIgnoreEnabled(),
             getIgnoredCategories()
         ]);
 
@@ -537,11 +539,6 @@ async function processComments() {
         comments.forEach(comment => {
             const content = comment.querySelector(".comment__content");
             if (!content) return;
-
-            if (mentionEnabled && Array.from(comment.querySelectorAll(".mentioned-user")).some(isIgnoredMention)) {
-                comment.style.display = "none";
-                return;
-            }
 
             const category = categorizeText(content.innerText || "");
             comment.style.display = ignoredCategories.includes(category) ? "none" : "";
