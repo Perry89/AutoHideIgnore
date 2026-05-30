@@ -22,6 +22,15 @@ const HOT_DISCUSSION_SELECTOR = [
     ".hot-discussion[href*='/la-rambla/dyskusja-']",
     ".hot-discussion a[href*='/la-rambla/dyskusja-']"
 ].join(",");
+const COMMENT_AUTHOR_SELECTOR = [
+    ".comment__meta .author__name",
+    ".comment__author .author__name",
+    ".comment__author a[href*='/user/']",
+    ".comment__meta a[href*='/user/']",
+    ".author__name",
+    ".comment__author",
+    "a[href*='/user/']"
+].join(",");
 
 const categoryOrder = [
     "polityka",
@@ -184,10 +193,11 @@ function normalize(text) {
 }
 
 function normalizeUsername(value) {
-    return normalize(value)
+    const username = normalize(value)
         .replace(/^@+/, "")
-        .replace(/[^\w.-]/g, "")
         .trim();
+    const match = username.match(/[a-z0-9][\w.-]*/);
+    return match ? match[0] : "";
 }
 
 async function storageGet(key, fallback) {
@@ -233,12 +243,22 @@ function usernameFromHref(href) {
 
 function usernameFromElement(el) {
     if (!el) return "";
-    return normalizeUsername(
-        el.getAttribute("data-username") ||
-        el.getAttribute("title") ||
-        el.textContent ||
-        usernameFromHref(el.getAttribute("href"))
-    );
+    return usernameFromHref(el.getAttribute("href")) ||
+        normalizeUsername(
+            el.getAttribute("data-username") ||
+            el.getAttribute("title") ||
+            el.textContent
+        );
+}
+
+function userIdFromElement(el) {
+    if (!el) return "";
+    const source = el.closest("[data-user-id], [user-id]") || el;
+    return String(source.getAttribute("data-user-id") || source.getAttribute("user-id") || "");
+}
+
+function commentAuthor(comment) {
+    return comment.querySelector(COMMENT_AUTHOR_SELECTOR);
 }
 
 function updateUsernameMap() {
@@ -274,12 +294,18 @@ function deleteIgnoredUserId(id) {
     return true;
 }
 
-function collectCommentUsers(comment, target, includeMentions = true) {
-    const author = comment.querySelector(".author__name, .comment__author, a[href*='/user/']");
-    const username = usernameFromHref(author?.getAttribute("href")) || usernameFromElement(author);
-    if (username) target.usernames.add(username);
+function collectCommentAuthor(comment, target) {
+    const author = commentAuthor(comment);
+    const username = usernameFromElement(author);
+    const id = userIdFromElement(author);
 
-    if (!includeMentions) return;
+    if (username) target.usernames.add(username);
+    if (id) target.userIds.add(id);
+    if (id && username) usernameToIdMap.set(username, id);
+}
+
+function collectIgnoredCommentUsers(comment, target) {
+    collectCommentAuthor(comment, target);
 
     comment.querySelectorAll(".mentioned-user").forEach(el => {
         const id = el.getAttribute("user-id");
@@ -298,7 +324,11 @@ function updateIgnoredUsersFromDOM() {
 
     document.querySelectorAll(".comment").forEach(comment => {
         const isIgnored = comment.matches(SITE_IGNORED_COMMENT_SELECTOR);
-        collectCommentUsers(comment, isIgnored ? ignored : visible, isIgnored);
+        if (isIgnored) {
+            collectIgnoredCommentUsers(comment, ignored);
+        } else {
+            collectCommentAuthor(comment, visible);
+        }
     });
 
     ignored.usernames.forEach(username => {
@@ -396,9 +426,38 @@ function isIgnoredMention(el) {
 }
 
 function isIgnoredAuthorElement(el) {
-    const username = usernameFromHref(el?.getAttribute("href")) || usernameFromElement(el);
-    const id = usernameToIdMap.get(username);
+    const username = usernameFromElement(el);
+    const id = userIdFromElement(el);
     return ignoredUsernamesCache.has(username) || (id && ignoredUserIdsCache.has(id));
+}
+
+function usernameFromUserActionButton(button) {
+    const container = button.closest(".user-profile-box, .user-block, li") || button;
+    const user =
+        container.querySelector(".meta__name, .user__name, .author__name, a[href*='/user/']") ||
+        button;
+
+    return usernameFromElement(user);
+}
+
+function updateIgnoredUserFromAction(button, shouldIgnore) {
+    const id = userIdFromElement(button);
+    const username = usernameFromUserActionButton(button);
+    let changed = false;
+
+    if (shouldIgnore) {
+        changed = addIgnoredUserId(id) || changed;
+        changed = addIgnoredUsername(username) || changed;
+    } else {
+        changed = deleteIgnoredUserId(id) || changed;
+        changed = deleteIgnoredUserId(usernameToIdMap.get(username)) || changed;
+        changed = deleteIgnoredUsername(username) || changed;
+    }
+
+    if (changed) {
+        saveIgnoredUsersToStorage();
+        processComments();
+    }
 }
 
 function hideHotDiscussionsFromIgnoredUsers() {
@@ -484,6 +543,17 @@ if (document.readyState === "loading") {
 
 ext.runtime.onMessage.addListener(msg => {
     if (msg.type === "updateFilters") processComments();
+});
+
+document.addEventListener("click", event => {
+    const ignoreButton = event.target.closest(".action--ignore");
+    const unignoreButton = event.target.closest(".action--unignore");
+
+    if (ignoreButton) {
+        setTimeout(() => updateIgnoredUserFromAction(ignoreButton, true), 800);
+    } else if (unignoreButton) {
+        setTimeout(() => updateIgnoredUserFromAction(unignoreButton, false), 800);
+    }
 });
 
 let observerTimeout = null;
