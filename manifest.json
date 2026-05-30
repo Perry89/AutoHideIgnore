@@ -4,7 +4,7 @@
   "description": "Hide ignored users and filter discussion categories on fcbarca.com.",
   "version": "2.3.0",
   "minimum_chrome_version": "88",
-  "permissions": ["storage", "tabs"],
+  "permissions": ["storage"],
   "host_permissions": ["*://www.fcbarca.com/*"],
   "action": {
     "default_popup": "popup/popup.html"
