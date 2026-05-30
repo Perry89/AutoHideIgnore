@@ -276,6 +276,12 @@ function commentAuthorScope(comment) {
     return comment.querySelector(".comment__header, .comment__meta, .comment__author") || commentAuthor(comment);
 }
 
+function isSiteIgnoredComment(comment) {
+    const headerText = normalize(comment.querySelector(".comment__header")?.textContent || "");
+    return comment.matches(SITE_IGNORED_COMMENT_SELECTOR) ||
+        headerText.includes("komentarz uzytkownika");
+}
+
 function updateUsernameMap() {
     document.querySelectorAll(".mentioned-user").forEach(el => {
         const id = el.getAttribute("user-id");
@@ -307,6 +313,24 @@ function deleteIgnoredUserId(id) {
     if (!normalizedId || !ignoredUserIdsCache.has(normalizedId)) return false;
     ignoredUserIdsCache.delete(normalizedId);
     return true;
+}
+
+function pruneUnmappedIgnoredUserIds() {
+    let changed = false;
+    const mappedIds = new Set();
+
+    ignoredUsernamesCache.forEach(username => {
+        const id = usernameToIdMap.get(username);
+        if (id) mappedIds.add(id);
+    });
+
+    Array.from(ignoredUserIdsCache).forEach(id => {
+        if (!mappedIds.has(id)) {
+            changed = deleteIgnoredUserId(id) || changed;
+        }
+    });
+
+    return changed;
 }
 
 function collectCommentAuthor(comment, target) {
@@ -347,28 +371,15 @@ function removeVisibleCachedAuthor(comment, ignored) {
     return changed;
 }
 
-function collectIgnoredCommentUsers(comment, target) {
-    collectCommentAuthor(comment, target);
-
-    comment.querySelectorAll(".mentioned-user").forEach(el => {
-        const id = el.getAttribute("user-id");
-        const mentionedUsername = usernameFromElement(el);
-
-        if (id) target.userIds.add(String(id));
-        if (mentionedUsername) target.usernames.add(mentionedUsername);
-        if (id && mentionedUsername) usernameToIdMap.set(mentionedUsername, String(id));
-    });
-}
-
 function updateIgnoredUsersFromDOM() {
     let changed = false;
     const ignored = { userIds: new Set(), usernames: new Set() };
     const visible = { userIds: new Set(), usernames: new Set() };
 
     document.querySelectorAll(".comment").forEach(comment => {
-        const isIgnored = comment.matches(SITE_IGNORED_COMMENT_SELECTOR);
+        const isIgnored = isSiteIgnoredComment(comment);
         if (isIgnored) {
-            collectIgnoredCommentUsers(comment, ignored);
+            collectCommentAuthor(comment, ignored);
         } else {
             collectCommentAuthor(comment, visible);
         }
@@ -395,9 +406,12 @@ function updateIgnoredUsersFromDOM() {
         }
     });
 
-    document.querySelectorAll(".comment:not(.comment--ignored):not(.comment--hidden):not(.comment-hidden)").forEach(comment => {
+    document.querySelectorAll(".comment").forEach(comment => {
+        if (isSiteIgnoredComment(comment)) return;
         changed = removeVisibleCachedAuthor(comment, ignored) || changed;
     });
+
+    changed = pruneUnmappedIgnoredUserIds() || changed;
 
     if (changed) saveIgnoredUsersToStorage();
 }
@@ -500,6 +514,7 @@ async function processComments() {
         if (!isExtensionAlive()) return;
 
         updateUsernameMap();
+        updateIgnoredUsersFromDOM();
         removeIgnoredComments();
 
         const [enabled, mentionEnabled, ignoredCategories] = await Promise.all([
