@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      min-width: 220px;
+    }
+    .category-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 6px;
+      text-transform: capitalize;
+    }
+
+    h3 {
+      margin: 0 0 12px;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #ddd;
+      margin: 10px 0;
+    }
+  </style>
+  <style id="togglecss">
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h3>Kategoryzacja</h3>
+
+<div class="toggle-row">
+  <span>Pokaz kategorie</span>
+  <input type="checkbox" id="toggleCategorization">
+</div>
+<div class="toggle-row">
+  <span>Ukryj mention ignorowanych</span>
+  <input type="checkbox" id="toggleMentionIgnore">
+</div>
+  <hr>
+
+  <div id="categories"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

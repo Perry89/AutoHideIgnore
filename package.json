@@ -1,12 +1,18 @@
 {
-  "name": "autohideignore",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "la-rambla-cleaner-firefox",
+  "version": "2.2.0",
+  "description": "Firefox extension for hiding ignored users and filtering fcbarca.com comment categories.",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "check": "node --check src/content.js && node --check popup/popup.js"
   },
-  "keywords": [],
+  "keywords": [
+    "firefox-extension",
+    "fcbarca",
+    "comments",
+    "content-filter",
+    "ignored-users"
+  ],
   "author": "",
   "license": "ISC"
 }
