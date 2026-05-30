@@ -249,18 +249,37 @@ function updateUsernameMap() {
     });
 }
 
-function setsMatch(first, second) {
-    if (first.size !== second.size) return false;
-    for (const value of first) {
-        if (!second.has(value)) return false;
-    }
+function addIgnoredUsername(username) {
+    if (!username || ignoredUsernamesCache.has(username)) return false;
+    ignoredUsernamesCache.add(username);
     return true;
 }
 
-function collectIgnoredCommentUsers(comment, target) {
+function addIgnoredUserId(id) {
+    if (!id || ignoredUserIdsCache.has(String(id))) return false;
+    ignoredUserIdsCache.add(String(id));
+    return true;
+}
+
+function deleteIgnoredUsername(username) {
+    if (!username || !ignoredUsernamesCache.has(username)) return false;
+    ignoredUsernamesCache.delete(username);
+    return true;
+}
+
+function deleteIgnoredUserId(id) {
+    const normalizedId = String(id || "");
+    if (!normalizedId || !ignoredUserIdsCache.has(normalizedId)) return false;
+    ignoredUserIdsCache.delete(normalizedId);
+    return true;
+}
+
+function collectCommentUsers(comment, target, includeMentions = true) {
     const author = comment.querySelector(".author__name, .comment__author, a[href*='/user/']");
     const username = usernameFromHref(author?.getAttribute("href")) || usernameFromElement(author);
     if (username) target.usernames.add(username);
+
+    if (!includeMentions) return;
 
     comment.querySelectorAll(".mentioned-user").forEach(el => {
         const id = el.getAttribute("user-id");
@@ -273,18 +292,35 @@ function collectIgnoredCommentUsers(comment, target) {
 }
 
 function updateIgnoredUsersFromDOM() {
+    let changed = false;
     const ignored = { userIds: new Set(), usernames: new Set() };
+    const visible = { userIds: new Set(), usernames: new Set() };
 
-    document.querySelectorAll(SITE_IGNORED_COMMENT_SELECTOR).forEach(comment => {
-        collectIgnoredCommentUsers(comment, ignored);
+    document.querySelectorAll(".comment").forEach(comment => {
+        const isIgnored = comment.matches(SITE_IGNORED_COMMENT_SELECTOR);
+        collectCommentUsers(comment, isIgnored ? ignored : visible, isIgnored);
     });
 
-    const changed =
-        !setsMatch(ignoredUsernamesCache, ignored.usernames) ||
-        !setsMatch(ignoredUserIdsCache, ignored.userIds);
+    ignored.usernames.forEach(username => {
+        changed = addIgnoredUsername(username) || changed;
+    });
 
-    ignoredUsernamesCache = ignored.usernames;
-    ignoredUserIdsCache = ignored.userIds;
+    ignored.userIds.forEach(id => {
+        changed = addIgnoredUserId(id) || changed;
+    });
+
+    visible.usernames.forEach(username => {
+        if (!ignored.usernames.has(username)) {
+            changed = deleteIgnoredUsername(username) || changed;
+            changed = deleteIgnoredUserId(usernameToIdMap.get(username)) || changed;
+        }
+    });
+
+    visible.userIds.forEach(id => {
+        if (!ignored.userIds.has(id)) {
+            changed = deleteIgnoredUserId(id) || changed;
+        }
+    });
 
     if (changed) saveIgnoredUsersToStorage();
 }

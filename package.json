@@ -1,6 +1,6 @@
 {
   "name": "la-rambla-cleaner-chrome",
-  "version": "2.3.2",
+  "version": "2.3.1",
   "description": "Chrome extension for hiding ignored users and filtering fcbarca.com comment categories.",
   "private": true,
   "scripts": {
