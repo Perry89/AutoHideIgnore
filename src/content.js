@@ -13,6 +13,16 @@ let ignoredUserIdsCache = new Set();
 let ignoredUsernamesCache = new Set();
 let usernameToIdMap = new Map();
 
+const SITE_IGNORED_COMMENT_SELECTOR = ".comment--ignored, .comment--hidden, .comment-hidden";
+const HOT_DISCUSSION_SELECTOR = [
+    "a.item[href*='/la-rambla/dyskusja-']",
+    ".hot-discussions a[href*='/la-rambla/dyskusja-']",
+    ".hot-discussions__item[href*='/la-rambla/dyskusja-']",
+    ".hot-discussions__item a[href*='/la-rambla/dyskusja-']",
+    ".hot-discussion[href*='/la-rambla/dyskusja-']",
+    ".hot-discussion a[href*='/la-rambla/dyskusja-']"
+].join(",");
+
 const categoryOrder = [
     "polityka",
     "transfery",
@@ -251,27 +261,65 @@ function addIgnoredUserId(id) {
     return true;
 }
 
+function deleteIgnoredUsername(username) {
+    if (!username || !ignoredUsernamesCache.has(username)) return false;
+    ignoredUsernamesCache.delete(username);
+    return true;
+}
+
+function deleteIgnoredUserId(id) {
+    const normalizedId = String(id || "");
+    if (!normalizedId || !ignoredUserIdsCache.has(normalizedId)) return false;
+    ignoredUserIdsCache.delete(normalizedId);
+    return true;
+}
+
+function collectCommentUsers(comment, target, includeMentions = true) {
+    const author = comment.querySelector(".author__name, .comment__author, a[href*='/user/']");
+    const username = usernameFromHref(author?.getAttribute("href")) || usernameFromElement(author);
+    if (username) target.usernames.add(username);
+
+    if (!includeMentions) return;
+
+    comment.querySelectorAll(".mentioned-user").forEach(el => {
+        const id = el.getAttribute("user-id");
+        const mentionedUsername = usernameFromElement(el);
+
+        if (id) target.userIds.add(String(id));
+        if (mentionedUsername) target.usernames.add(mentionedUsername);
+        if (id && mentionedUsername) usernameToIdMap.set(mentionedUsername, String(id));
+    });
+}
+
 function updateIgnoredUsersFromDOM() {
     let changed = false;
+    const ignored = { userIds: new Set(), usernames: new Set() };
+    const visible = { userIds: new Set(), usernames: new Set() };
 
     document.querySelectorAll(".comment").forEach(comment => {
-        const isIgnored =
-            comment.classList.contains("comment--ignored") ||
-            comment.classList.contains("comment--hidden") ||
-            comment.classList.contains("comment-hidden") ||
-            comment.classList.contains("ignored") ||
-            comment.style.display === "none";
+        const isIgnored = comment.matches(SITE_IGNORED_COMMENT_SELECTOR);
+        collectCommentUsers(comment, isIgnored ? ignored : visible, isIgnored);
+    });
 
-        if (!isIgnored) return;
-
-        const author = comment.querySelector(".author__name, .comment__author, a[href*='/user/']");
-        const username = usernameFromHref(author?.getAttribute("href")) || usernameFromElement(author);
+    ignored.usernames.forEach(username => {
         changed = addIgnoredUsername(username) || changed;
+    });
 
-        comment.querySelectorAll(".mentioned-user").forEach(el => {
-            changed = addIgnoredUserId(el.getAttribute("user-id")) || changed;
-            changed = addIgnoredUsername(usernameFromElement(el)) || changed;
-        });
+    ignored.userIds.forEach(id => {
+        changed = addIgnoredUserId(id) || changed;
+    });
+
+    visible.usernames.forEach(username => {
+        if (!ignored.usernames.has(username)) {
+            changed = deleteIgnoredUsername(username) || changed;
+            changed = deleteIgnoredUserId(usernameToIdMap.get(username)) || changed;
+        }
+    });
+
+    visible.userIds.forEach(id => {
+        if (!ignored.userIds.has(id)) {
+            changed = deleteIgnoredUserId(id) || changed;
+        }
     });
 
     if (changed) saveIgnoredUsersToStorage();
@@ -279,7 +327,7 @@ function updateIgnoredUsersFromDOM() {
 
 function removeIgnoredComments() {
     document
-        .querySelectorAll(".comment--ignored, .comment--hidden, .comment-hidden")
+        .querySelectorAll(SITE_IGNORED_COMMENT_SELECTOR)
         .forEach(comment => comment.remove());
 }
 
@@ -354,23 +402,18 @@ function isIgnoredAuthorElement(el) {
 }
 
 function hideHotDiscussionsFromIgnoredUsers() {
-    const hotItems = document.querySelectorAll(
-        [
-            "a.item",
-            ".hot-discussions a",
-            ".hot-discussions__item",
-            ".hot-discussion",
-            "[class*='hot'] a[href*='/dyskusje/']"
-        ].join(",")
-    );
+    const hotItems = document.querySelectorAll(HOT_DISCUSSION_SELECTOR);
 
     hotItems.forEach(item => {
+        const card = item.matches("a.item, .hot-discussions__item, .hot-discussion")
+            ? item
+            : item.closest("a.item, .hot-discussions__item, .hot-discussion") || item;
         const author =
-            item.querySelector(".item__author .meta, .author__name, a[href*='/user/'], [href*='/user/']") ||
-            item.querySelector(".item__author");
+            card.querySelector(".item__author .meta, .author__name, a[href*='/user/'], [href*='/user/']") ||
+            card.querySelector(".item__author");
 
         if (isIgnoredAuthorElement(author)) {
-            item.remove();
+            card.remove();
         }
     });
 }
