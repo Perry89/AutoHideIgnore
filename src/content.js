@@ -28,8 +28,7 @@ const COMMENT_AUTHOR_SELECTOR = [
     ".comment__author a[href*='/user/']",
     ".comment__meta a[href*='/user/']",
     ".author__name",
-    ".comment__author",
-    "a[href*='/user/']"
+    ".comment__author"
 ].join(",");
 
 const categoryOrder = [
@@ -282,13 +281,11 @@ function isSiteIgnoredComment(comment) {
         headerText.includes("komentarz uzytkownika");
 }
 
-function normalCommentContainsUsername(comment, username) {
+function normalCommentAuthorContainsUsername(comment, username) {
     if (!username || isSiteIgnoredComment(comment)) return false;
 
     const authorScope = commentAuthorScope(comment);
-    if (authorScope && textContainsUsername(authorScope.textContent, username)) return true;
-
-    return textContainsUsername(comment.textContent, username);
+    return Boolean(authorScope && textContainsUsername(authorScope.textContent, username));
 }
 
 function updateUsernameMap() {
@@ -371,7 +368,7 @@ function removeVisibleCachedAuthor(comment, ignored) {
     }
 
     Array.from(ignoredUsernamesCache).forEach(cachedUsername => {
-        if (!ignored.usernames.has(cachedUsername) && normalCommentContainsUsername(comment, cachedUsername)) {
+        if (!ignored.usernames.has(cachedUsername) && normalCommentAuthorContainsUsername(comment, cachedUsername)) {
             changed = deleteIgnoredUsername(cachedUsername) || changed;
             changed = deleteIgnoredUserId(usernameToIdMap.get(cachedUsername)) || changed;
         }
