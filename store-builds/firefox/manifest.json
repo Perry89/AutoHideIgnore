@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "La Rambla Cleaner",
   "description": "Hide ignored users and filter discussion categories on fcbarca.com.",
-  "version": "2.3.5",
+  "version": "2.3.7",
   "permissions": ["storage", "tabs"],
   "host_permissions": ["*://www.fcbarca.com/*"],
   "action": {
@@ -18,7 +18,10 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "larambla-cleaner@example.com",
-      "strict_min_version": "109.0"
+      "strict_min_version": "109.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
     },
     "gecko_android": {
       "strict_min_version": "120.0"
