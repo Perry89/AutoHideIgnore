@@ -486,6 +486,12 @@ function addCategoryLabel(comment, category) {
     }
 }
 
+function isIgnoredMention(el) {
+    const id = el.getAttribute("user-id");
+    const username = usernameFromElement(el);
+    return (id && ignoredUserIdsCache.has(String(id))) || ignoredUsernamesCache.has(username);
+}
+
 function isIgnoredAuthorElement(el) {
     const username = usernameFromElement(el);
     const id = userIdFromElement(el);
@@ -517,8 +523,9 @@ async function processComments() {
         updateIgnoredUsersFromDOM();
         removeIgnoredComments();
 
-        const [enabled, ignoredCategories] = await Promise.all([
+        const [enabled, mentionEnabled, ignoredCategories] = await Promise.all([
             getCategorizationEnabled(),
+            getMentionIgnoreEnabled(),
             getIgnoredCategories()
         ]);
 
@@ -536,6 +543,11 @@ async function processComments() {
         comments.forEach(comment => {
             const content = comment.querySelector(".comment__content");
             if (!content) return;
+
+            if (mentionEnabled && Array.from(comment.querySelectorAll(".mentioned-user")).some(isIgnoredMention)) {
+                comment.style.display = "none";
+                return;
+            }
 
             const category = categorizeText(content.innerText || "");
             comment.style.display = ignoredCategories.includes(category) ? "none" : "";
