@@ -271,6 +271,10 @@ function commentAuthor(comment) {
     return comment.querySelector(COMMENT_AUTHOR_SELECTOR);
 }
 
+function commentContent(comment) {
+    return Array.from(comment.children).find(child => child.classList?.contains("comment__content")) || null;
+}
+
 function commentAuthorScope(comment) {
     return comment.querySelector(".comment__header, .comment__meta, .comment__author") || commentAuthor(comment);
 }
@@ -487,8 +491,14 @@ function addCategoryLabel(comment, category) {
 }
 
 function isIgnoredMention(el) {
-    const username = usernameFromElement(el);
+    const link = el.matches("a[href*='/user/']") ? el : el.querySelector("a[href*='/user/']");
+    const username = usernameFromHref(link?.getAttribute("href")) || usernameFromElement(el);
     return ignoredUsernamesCache.has(username);
+}
+
+function hasIgnoredMention(content) {
+    return Array.from(content.querySelectorAll(".mentioned-user, .mentioned-user a[href*='/user/']"))
+        .some(isIgnoredMention);
 }
 
 function isIgnoredAuthorElement(el) {
@@ -540,10 +550,10 @@ async function processComments() {
         }
 
         comments.forEach(comment => {
-            const content = comment.querySelector(".comment__content");
+            const content = commentContent(comment);
             if (!content) return;
 
-            if (mentionEnabled && Array.from(content.querySelectorAll(".mentioned-user")).some(isIgnoredMention)) {
+            if (mentionEnabled && hasIgnoredMention(content)) {
                 comment.style.display = "none";
                 return;
             }
