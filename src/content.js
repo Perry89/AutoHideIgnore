@@ -267,20 +267,29 @@ function userIdFromElement(el) {
     return String(source.getAttribute("data-user-id") || source.getAttribute("user-id") || "");
 }
 
-function commentAuthor(comment) {
-    return comment.querySelector(COMMENT_AUTHOR_SELECTOR);
+function directCommentChild(comment, selector) {
+    return Array.from(comment.children).find(child => child.matches(selector)) || null;
 }
 
 function commentContent(comment) {
-    return Array.from(comment.children).find(child => child.classList?.contains("comment__content")) || null;
+    return directCommentChild(comment, ".comment__content");
+}
+
+function commentHeader(comment) {
+    return directCommentChild(comment, ".comment__header, .comment__meta, .comment__author");
+}
+
+function commentAuthor(comment) {
+    const scope = commentHeader(comment) || comment;
+    return scope.matches(COMMENT_AUTHOR_SELECTOR) ? scope : scope.querySelector(COMMENT_AUTHOR_SELECTOR);
 }
 
 function commentAuthorScope(comment) {
-    return comment.querySelector(".comment__header, .comment__meta, .comment__author") || commentAuthor(comment);
+    return commentHeader(comment) || commentAuthor(comment);
 }
 
 function isSiteIgnoredComment(comment) {
-    const headerText = normalize(comment.querySelector(".comment__header")?.textContent || "");
+    const headerText = normalize(commentHeader(comment)?.textContent || "");
     return comment.matches(SITE_IGNORED_COMMENT_SELECTOR) ||
         headerText.includes("komentarz uzytkownika");
 }
@@ -493,7 +502,8 @@ function addCategoryLabel(comment, category) {
 function isIgnoredMention(el) {
     const link = el.matches("a[href*='/user/']") ? el : el.querySelector("a[href*='/user/']");
     const username = usernameFromHref(link?.getAttribute("href")) || usernameFromElement(el);
-    return ignoredUsernamesCache.has(username);
+    const id = userIdFromElement(el);
+    return ignoredUsernamesCache.has(username) || (id && ignoredUserIdsCache.has(id));
 }
 
 function hasIgnoredMention(content) {
@@ -540,21 +550,18 @@ async function processComments() {
 
         const comments = document.querySelectorAll(".comment");
 
-        if (!enabled) {
-            comments.forEach(comment => {
-                comment.style.display = "";
-                comment.querySelector(".la-rambla-cleaner-category-label")?.remove();
-            });
-            hideHotDiscussionsFromIgnoredUsers();
-            return;
-        }
-
         comments.forEach(comment => {
             const content = commentContent(comment);
             if (!content) return;
 
             if (mentionEnabled && hasIgnoredMention(content)) {
                 comment.style.display = "none";
+                return;
+            }
+
+            if (!enabled) {
+                comment.style.display = "";
+                comment.querySelector(".la-rambla-cleaner-category-label")?.remove();
                 return;
             }
 
