@@ -267,31 +267,29 @@ function userIdFromElement(el) {
     return String(source.getAttribute("data-user-id") || source.getAttribute("user-id") || "");
 }
 
-function directCommentChild(comment, selector) {
-    return Array.from(comment.children).find(child => child.matches(selector)) || null;
-}
-
 function commentContent(comment) {
-    return directCommentChild(comment, ".comment__content");
-}
-
-function commentHeader(comment) {
-    return directCommentChild(comment, ".comment__header, .comment__meta, .comment__author");
+    return Array.from(comment.children).find(child => child.classList?.contains("comment__content")) ||
+        comment.querySelector(".comment__content");
 }
 
 function commentAuthor(comment) {
-    const scope = commentHeader(comment) || comment;
-    return scope.matches(COMMENT_AUTHOR_SELECTOR) ? scope : scope.querySelector(COMMENT_AUTHOR_SELECTOR);
+    return comment.querySelector(COMMENT_AUTHOR_SELECTOR);
 }
 
 function commentAuthorScope(comment) {
-    return commentHeader(comment) || commentAuthor(comment);
+    return comment.querySelector(".comment__header, .comment__meta, .comment__author") || commentAuthor(comment);
 }
 
 function isSiteIgnoredComment(comment) {
-    const headerText = normalize(commentHeader(comment)?.textContent || "");
+    const headerText = normalize(comment.querySelector(".comment__header")?.textContent || "");
     return comment.matches(SITE_IGNORED_COMMENT_SELECTOR) ||
         headerText.includes("komentarz uzytkownika");
+}
+
+function ignoredUsernameFromCommentText(comment) {
+    const text = normalize(comment.textContent || "");
+    const match = text.match(/komentarz uzytkownika\s+([^,.\n]+?)\s*,?\s+ktorego ignorujesz/);
+    return match ? normalizeUsername(match[1]) : "";
 }
 
 function normalCommentAuthorContainsUsername(comment, username) {
@@ -396,9 +394,11 @@ function updateIgnoredUsersFromDOM() {
     const visible = { userIds: new Set(), usernames: new Set() };
 
     document.querySelectorAll(".comment").forEach(comment => {
-        const isIgnored = isSiteIgnoredComment(comment);
+        const ignoredUsername = ignoredUsernameFromCommentText(comment);
+        const isIgnored = isSiteIgnoredComment(comment) || Boolean(ignoredUsername);
         if (isIgnored) {
             collectCommentAuthor(comment, ignored);
+            if (ignoredUsername) ignored.usernames.add(ignoredUsername);
         } else {
             collectCommentAuthor(comment, visible);
         }
