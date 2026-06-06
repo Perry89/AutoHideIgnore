@@ -267,16 +267,29 @@ function userIdFromElement(el) {
     return String(source.getAttribute("data-user-id") || source.getAttribute("user-id") || "");
 }
 
+function directCommentChild(comment, selector) {
+    return Array.from(comment.children).find(child => child.matches(selector)) || null;
+}
+
+function commentContent(comment) {
+    return directCommentChild(comment, ".comment__content");
+}
+
+function commentHeader(comment) {
+    return directCommentChild(comment, ".comment__header, .comment__meta, .comment__author");
+}
+
 function commentAuthor(comment) {
-    return comment.querySelector(COMMENT_AUTHOR_SELECTOR);
+    const scope = commentHeader(comment) || comment;
+    return scope.matches(COMMENT_AUTHOR_SELECTOR) ? scope : scope.querySelector(COMMENT_AUTHOR_SELECTOR);
 }
 
 function commentAuthorScope(comment) {
-    return comment.querySelector(".comment__header, .comment__meta, .comment__author") || commentAuthor(comment);
+    return commentHeader(comment) || commentAuthor(comment);
 }
 
 function isSiteIgnoredComment(comment) {
-    const headerText = normalize(comment.querySelector(".comment__header")?.textContent || "");
+    const headerText = normalize(commentHeader(comment)?.textContent || "");
     return comment.matches(SITE_IGNORED_COMMENT_SELECTOR) ||
         headerText.includes("komentarz uzytkownika");
 }
@@ -486,6 +499,18 @@ function addCategoryLabel(comment, category) {
     }
 }
 
+function isIgnoredMention(el) {
+    const link = el.matches("a[href*='/user/']") ? el : el.querySelector("a[href*='/user/']");
+    const username = usernameFromHref(link?.getAttribute("href")) || usernameFromElement(el);
+    const id = userIdFromElement(el);
+    return ignoredUsernamesCache.has(username) || (id && ignoredUserIdsCache.has(id));
+}
+
+function hasIgnoredMention(content) {
+    return Array.from(content.querySelectorAll(".mentioned-user, .mentioned-user a[href*='/user/']"))
+        .some(isIgnoredMention);
+}
+
 function isIgnoredAuthorElement(el) {
     const username = usernameFromElement(el);
     const id = userIdFromElement(el);
@@ -517,25 +542,28 @@ async function processComments() {
         updateIgnoredUsersFromDOM();
         removeIgnoredComments();
 
-        const [enabled, ignoredCategories] = await Promise.all([
+        const [enabled, mentionEnabled, ignoredCategories] = await Promise.all([
             getCategorizationEnabled(),
+            getMentionIgnoreEnabled(),
             getIgnoredCategories()
         ]);
 
         const comments = document.querySelectorAll(".comment");
 
-        if (!enabled) {
-            comments.forEach(comment => {
+        comments.forEach(comment => {
+            const content = commentContent(comment);
+            if (!content) return;
+
+            if (mentionEnabled && hasIgnoredMention(content)) {
+                comment.style.display = "none";
+                return;
+            }
+
+            if (!enabled) {
                 comment.style.display = "";
                 comment.querySelector(".la-rambla-cleaner-category-label")?.remove();
-            });
-            hideHotDiscussionsFromIgnoredUsers();
-            return;
-        }
-
-        comments.forEach(comment => {
-            const content = comment.querySelector(".comment__content");
-            if (!content) return;
+                return;
+            }
 
             const category = categorizeText(content.innerText || "");
             comment.style.display = ignoredCategories.includes(category) ? "none" : "";
