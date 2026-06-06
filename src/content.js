@@ -487,9 +487,8 @@ function addCategoryLabel(comment, category) {
 }
 
 function isIgnoredMention(el) {
-    const id = el.getAttribute("user-id");
     const username = usernameFromElement(el);
-    return (id && ignoredUserIdsCache.has(String(id))) || ignoredUsernamesCache.has(username);
+    return ignoredUsernamesCache.has(username);
 }
 
 function isIgnoredAuthorElement(el) {
@@ -544,7 +543,7 @@ async function processComments() {
             const content = comment.querySelector(".comment__content");
             if (!content) return;
 
-            if (mentionEnabled && Array.from(comment.querySelectorAll(".mentioned-user")).some(isIgnoredMention)) {
+            if (mentionEnabled && Array.from(content.querySelectorAll(".mentioned-user")).some(isIgnoredMention)) {
                 comment.style.display = "none";
                 return;
             }
