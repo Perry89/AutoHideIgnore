@@ -281,9 +281,9 @@ function commentAuthorScope(comment) {
 }
 
 function isSiteIgnoredComment(comment) {
-    const headerText = normalize(comment.querySelector(".comment__header")?.textContent || "");
+    const markerText = normalize(comment.querySelector(".comment__header")?.textContent || comment.textContent || "");
     return comment.matches(SITE_IGNORED_COMMENT_SELECTOR) ||
-        headerText.includes("komentarz uzytkownika");
+        (markerText.includes("komentarz uzytkownika") && markerText.includes("ktorego ignorujesz"));
 }
 
 function ignoredUsernameFromCommentText(comment) {
@@ -439,6 +439,12 @@ function removeIgnoredComments() {
     document
         .querySelectorAll(SITE_IGNORED_COMMENT_SELECTOR)
         .forEach(comment => comment.remove());
+
+    document
+        .querySelectorAll(".comment")
+        .forEach(comment => {
+            if (isSiteIgnoredComment(comment)) comment.remove();
+        });
 }
 
 function categorizeText(text) {
