@@ -12,7 +12,9 @@ for browser, suffix in [("chrome", "zip"), ("firefox", "xpi")]:
     destination.mkdir(parents=True, exist_ok=True)
     for folder in ["src", "popup"]:
         shutil.copytree(root / folder, destination / folder, dirs_exist_ok=True)
-    manifest_path = root / ("manifest.firefox.json" if browser == "firefox" else "manifest.json")
+    manifest_path = root / ("manifest.firefox.json" if browser == "firefox" else "manifest.chrome.json")
+    if not manifest_path.exists():
+        manifest_path = root / "manifest.json"
     manifest = json.loads(manifest_path.read_text())
     (destination / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     (destination / "src/translation-config.js").write_text(
