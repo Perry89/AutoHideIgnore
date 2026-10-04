@@ -2,6 +2,7 @@ const isFirefox = typeof browser !== "undefined";
 const ext = isFirefox ? browser : chrome;
 
 const STORAGE_KEYS = {
+    borneoTranslatorEnabled: "borneoTranslatorEnabled",
     categories: "ignoredCategories",
     categorizationEnabled: "categorizationEnabled",
     mentionIgnoreEnabled: "mentionIgnoreEnabled",
@@ -540,6 +541,134 @@ function hideHotDiscussionsFromIgnoredUsers() {
     });
 }
 
+// Only inspect nodes owned by this comment, never an author from a nested reply.
+function ownCommentNode(comment, selector) {
+    return Array.from(comment.querySelectorAll(selector))
+        .find(node => node.closest(".comment") === comment);
+}
+
+const borneoOriginalContents = new WeakMap();
+
+function renderBorneoCorrection(content, translation) {
+    const originalLinks = new Map();
+    content.querySelectorAll("a[href]").forEach(link => {
+        const href = link.getAttribute("href");
+        if (!/^(https?:\/\/|\/user\/)/i.test(href || "")) return;
+        originalLinks.set(link.textContent.trim().toLowerCase(), link);
+        originalLinks.set(href, link);
+    });
+    const paragraph = document.createElement("p");
+    paragraph.style.whiteSpace = "pre-wrap";
+    // Build DOM nodes from plain text. Never interpret model output as HTML.
+    const tokens = /(?:https?:\/\/|www\.)[^\s<>]+|@[\p{L}\p{N}_.-]+/gu;
+    let offset = 0;
+    for (const match of translation.matchAll(tokens)) {
+        paragraph.append(document.createTextNode(translation.slice(offset, match.index)));
+        let token = match[0];
+        let suffix = "";
+        if (/^(https?:|www\.)/i.test(token)) {
+            const trimmed = token.replace(/[.,;:!?)}\]]+$/, "");
+            suffix = token.slice(trimmed.length);
+            token = trimmed;
+        }
+        const original = originalLinks.get(token.toLowerCase()) || originalLinks.get(token);
+        let node;
+        if (original) {
+            const mention = original.closest(".mentioned-user");
+            node = (mention && content.contains(mention) ? mention : original).cloneNode(true);
+            const anchor = node.matches("a") ? node : node.querySelector("a");
+            if (anchor) anchor.textContent = token;
+        } else {
+            node = document.createElement("a");
+            node.textContent = token;
+            if (token.startsWith("@")) {
+                node.href = `/user/${encodeURIComponent(token.slice(1))}`;
+                node.className = "mentioned-user";
+            } else {
+                node.href = token.startsWith("www.") ? `https://${token}` : token;
+                node.target = "_blank";
+                node.rel = "noopener noreferrer";
+            }
+        }
+        paragraph.append(node, document.createTextNode(suffix));
+        offset = match.index + match[0].length;
+    }
+    paragraph.append(document.createTextNode(translation.slice(offset)));
+    if (!borneoOriginalContents.has(content)) {
+        borneoOriginalContents.set(content, Array.from(content.childNodes));
+    }
+    content.replaceChildren(paragraph);
+}
+
+function updateBorneoTranslator(comment, enabled) {
+    const existing = ownCommentNode(comment, ".borneo-translator");
+    const author = ownCommentNode(comment, COMMENT_AUTHOR_SELECTOR);
+    const content = ownCommentNode(comment, ".comment__content");
+    if (!enabled || !/^comment-\d+$/.test(comment.id) ||
+        usernameFromElement(author) !== "borneo" || !content) {
+        existing?.remove();
+        if (content && borneoOriginalContents.has(content)) {
+            content.replaceChildren(...borneoOriginalContents.get(content));
+            borneoOriginalContents.delete(content);
+        }
+        return;
+    }
+    if (existing) return;
+
+    const panel = document.createElement("div");
+    panel.className = "borneo-translator";
+    Object.assign(panel.style, {
+        display: "inline-flex", alignItems: "center", gap: "6px", marginLeft: "10px"
+    });
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "Przetlumacz";
+    button.className = "button button--small";
+    Object.assign(button.style, {
+        cursor: "pointer", color: "#a21d3d", background: "transparent",
+        border: "1px solid currentColor", borderRadius: "3px", padding: "4px 8px",
+        font: "inherit"
+    });
+    const output = document.createElement("div");
+    output.setAttribute("role", "status");
+    output.setAttribute("aria-live", "polite");
+    output.style.whiteSpace = "pre-wrap";
+    output.style.fontSize = "12px";
+    panel.append(button, output);
+    // Place the controls beside the category in this comment's header.
+    const meta = ownCommentNode(comment, ".comment__meta");
+    if (!meta) return;
+    const category = meta.querySelector(".la-rambla-cleaner-category-label");
+    const links = meta.querySelector(".links");
+    if (category) category.after(panel);
+    else if (links) links.after(panel);
+    else meta.appendChild(panel);
+    button.addEventListener("click", async event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const copy = content.cloneNode(true);
+        copy.querySelectorAll(".comment, script, style, .borneo-translator").forEach(node => node.remove());
+        copy.querySelectorAll("br").forEach(node => node.replaceWith("\n"));
+        const text = (copy.innerText || copy.textContent || "").trim();
+        if (!text) return;
+        button.disabled = true;
+        output.textContent = "Poprawianie komentarza…";
+        try {
+            const result = await ext.runtime.sendMessage({ type: "translateBorneo", commentId: comment.id, text });
+            if (result?.error) throw new Error(result.error);
+            if (!result?.translation) throw new Error("Brak poprawionej wersji komentarza.");
+            // A disabled feature must not apply an in-flight response.
+            if (!panel.isConnected || !await storageGet(STORAGE_KEYS.borneoTranslatorEnabled, true)) return;
+            renderBorneoCorrection(content, result.translation);
+            output.textContent = "";
+            button.textContent = "Przetłumaczono";
+        } catch (error) {
+            output.textContent = error.message || "Nie udało się poprawić komentarza. Spróbuj ponownie.";
+            button.disabled = false;
+        }
+    });
+}
+
 async function processComments() {
     try {
         if (!isExtensionAlive()) return;
@@ -548,15 +677,17 @@ async function processComments() {
         updateIgnoredUsersFromDOM();
         removeIgnoredComments();
 
-        const [enabled, mentionEnabled, ignoredCategories] = await Promise.all([
+        const [enabled, mentionEnabled, ignoredCategories, borneoEnabled] = await Promise.all([
             getCategorizationEnabled(),
             getMentionIgnoreEnabled(),
-            getIgnoredCategories()
+            getIgnoredCategories(),
+            storageGet(STORAGE_KEYS.borneoTranslatorEnabled, true)
         ]);
 
         const comments = document.querySelectorAll(".comment");
 
         comments.forEach(comment => {
+            updateBorneoTranslator(comment, borneoEnabled);
             const content = commentContent(comment);
             if (!content) return;
 
@@ -601,6 +732,10 @@ if (document.readyState === "loading") {
 } else {
     init();
 }
+
+ext.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && changes.borneoTranslatorEnabled) processComments();
+});
 
 ext.runtime.onMessage.addListener(msg => {
     if (msg.type === "updateFilters") processComments();
