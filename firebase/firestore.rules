@@ -1,0 +1,7 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Only the authenticated Cloud Function (Admin SDK) may access this cache.
+    match /{document=**} { allow read, write: if false; }
+  }
+}

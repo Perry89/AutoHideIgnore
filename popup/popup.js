@@ -84,14 +84,21 @@ function setMentionIgnoreEnabled(value) {
 async function render() {
     const container = document.getElementById("categories");
     const categoryToggle = document.getElementById("toggleCategorization");
+    const borneoToggle = document.getElementById("toggleBorneoTranslator");
     const mentionToggle = document.getElementById("toggleMentionIgnore");
 
-    const [ignored, enabled, mentionEnabled] = await Promise.all([
+    const [ignored, enabled, mentionEnabled, borneoEnabled] = await Promise.all([
         getIgnoredCategories(),
         getCategorizationEnabled(),
-        getMentionIgnoreEnabled()
+        getMentionIgnoreEnabled(),
+        storageGet("borneoTranslatorEnabled", true)
     ]);
 
+    borneoToggle.checked = borneoEnabled;
+    borneoToggle.onchange = async () => {
+        await storageSet({ borneoTranslatorEnabled: borneoToggle.checked });
+        await notifyContentScript();
+    };
     categoryToggle.checked = enabled;
     mentionToggle.checked = mentionEnabled;
     container.innerHTML = "";
