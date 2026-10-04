@@ -27,3 +27,10 @@ logs/
 
 # Temp
 tmp/
+
+# Local service configuration and upload archives
+.env.*
+.firebaserc
+translation-config.local.json
+*.zip
+*.xpi

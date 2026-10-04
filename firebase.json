@@ -1,0 +1,4 @@
+{
+  "functions": [{ "source": "firebase/functions", "codebase": "borneo-translator" }],
+  "firestore": { "rules": "firebase/firestore.rules" }
+}
