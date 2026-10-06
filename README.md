@@ -27,3 +27,7 @@ Funkcja jest domyślnie włączona. Aby ją wyłączyć, odznacz **Borneo Tlumac
 ## Ustawienia
 
 Kliknij ikonę La Rambla Cleaner na pasku przeglądarki, aby otworzyć okienko ustawień. Wybrane opcje są zapamiętywane przez przeglądarkę.
+
+## Obsługiwane przeglądarki
+
+Dodatek jest dostępny dla Chrome oraz Firefoksa. Wersja dla Firefoksa wymaga co najmniej Firefoksa 140 na komputerze lub Firefoksa 142 na Androidzie.
