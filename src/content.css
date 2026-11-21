@@ -1,0 +1,51 @@
+/* Compact additions that follow the site's comment header baseline. */
+.comment__meta.la-rambla-cleaner-meta {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    row-gap: 4px;
+}
+.la-rambla-cleaner-category-label {
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    vertical-align: middle;
+    margin: 5px 0 0 6px;
+    padding: 0 6px;
+    min-height: 20px;
+    border-radius: 4px;
+    background: #a21d3d0d;
+    color: #a21d3d;
+    font: 600 12px/20px Arial, sans-serif;
+    white-space: nowrap;
+}
+.borneo-translator {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    vertical-align: middle;
+    gap: 6px;
+    margin: 5px 0 0 6px;
+}
+.borneo-translator > button.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-height: 20px;
+    height: auto;
+    margin: 0;
+    padding: 0 6px;
+    border: 1px solid #a21d3d55;
+    border-radius: 4px;
+    background: transparent;
+    color: #a21d3d;
+    font: 500 12px/18px Arial, sans-serif;
+    text-transform: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.borneo-translator > button.button:hover:not(:disabled) { background: #a21d3d0d; }
+.borneo-translator > button.button:focus-visible { outline: 2px solid #a21d3d; outline-offset: 2px; }
+.borneo-translator > button.button:disabled { cursor: default; opacity: .7; }
+.borneo-translator [role="status"]:empty { display: none; }

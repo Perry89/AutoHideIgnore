@@ -86,13 +86,21 @@ async function render() {
     const categoryToggle = document.getElementById("toggleCategorization");
     const borneoToggle = document.getElementById("toggleBorneoTranslator");
     const mentionToggle = document.getElementById("toggleMentionIgnore");
+    const hideXToggle = document.getElementById("toggleHideXPosts");
 
-    const [ignored, enabled, mentionEnabled, borneoEnabled] = await Promise.all([
+    const [ignored, enabled, mentionEnabled, borneoEnabled, hideXPosts] = await Promise.all([
         getIgnoredCategories(),
         getCategorizationEnabled(),
         getMentionIgnoreEnabled(),
-        storageGet("borneoTranslatorEnabled", true)
+        storageGet("borneoTranslatorEnabled", true),
+        storageGet("hideXPostsEnabled", false)
     ]);
+
+    hideXToggle.checked = hideXPosts;
+    hideXToggle.onchange = async () => {
+        await storageSet({ hideXPostsEnabled: hideXToggle.checked });
+        await notifyContentScript();
+    };
 
     borneoToggle.checked = borneoEnabled;
     borneoToggle.onchange = async () => {
