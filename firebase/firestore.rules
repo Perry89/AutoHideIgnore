@@ -1,6 +1,11 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Public configuration only; collection listing and all client writes are denied.
+    match /categoryDictionaries/current {
+      allow get: if true;
+      allow list, write: if false;
+    }
     // Only the authenticated Cloud Function (Admin SDK) may access this cache.
     match /{document=**} { allow read, write: if false; }
   }

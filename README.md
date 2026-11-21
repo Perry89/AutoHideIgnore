@@ -50,3 +50,7 @@ Gałęzie `chrome-store` i `firefox-store` zachowują osobne domyślne pliki `ma
 Naprawiono rozpoznawanie ignorowanych komentarzy: cytat komunikatu strony w zwykłym wpisie nie ukrywa już autora ani całej dyskusji. Wykrywanie opiera się na oznaczeniu lub własnym nagłówku komunikatu strony i pomija treść komentarza oraz zagnieżdżone odpowiedzi. Testy obejmują cytaty, rzeczywiste komunikaty i odpowiedzi.
 
 Aktualny polski opis do obu sklepów: [docs/opis-sklepy-pl.txt](docs/opis-sklepy-pl.txt). Informacja o poprawce: [docs/zmiany-2.4.6-2.4.7-pl.txt](docs/zmiany-2.4.6-2.4.7-pl.txt).
+
+## Firebase category dictionaries (Chrome 2.4.8 / Firefox 2.4.9)
+
+Keywords now come from `categoryDictionaries/current` in the existing Borneo Firebase project. All nine categories share one versioned document; GTA remains in Games. The extension caches it locally and checks at most once per 24 hours across tabs, including failed attempts. Last downloaded data and bundled keywords provide offline fallback. See [administration and cost details](docs/firebase-keywords.md).

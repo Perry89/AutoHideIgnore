@@ -57,7 +57,7 @@ const thresholds = {
     muzyka: 2
 };
 
-const categories = {
+let categories = {
     polityka: [
         "pis", "ko", "kpo", "ue", "usa", "onz", "nato", "tk", "tsue", "sn", "nsa",
         "wybor", "rzad", "unia europejska", "bruksela", "platform", "obywatelsk",
@@ -779,7 +779,18 @@ async function processComments() {
     }
 }
 
+async function loadCategoryDictionary() {
+    try {
+        const result = await ext.runtime.sendMessage({ type: "getCategoryDictionary" });
+        if (globalThis.CategoryDictionary.valid(result?.dictionary)) {
+            categories = result.dictionary.categories;
+            processComments();
+        }
+    } catch (_) { /* Keep the bundled offline fallback. */ }
+}
+
 async function init() {
+    loadCategoryDictionary();
     await loadIgnoredUsersFromStorage();
     updateUsernameMap();
     updateIgnoredUsersFromDOM();
