@@ -70,3 +70,60 @@ test("recognizes new multiword topics across categories", () => {
         ["Podsiadło i Sanah wydali nowe utwory.", "muzyka"]
     ]) assert.equal(categoryContext.categorizeText(text), category, text);
 });
+
+const ignoredContext = vm.createContext({});
+vm.runInContext(
+    source.slice(source.indexOf("const SITE_IGNORED_COMMENT_SELECTOR"), source.indexOf("const categoryOrder")) +
+    source.slice(source.indexOf("function normalize(text)"), source.indexOf("async function storageGet")) +
+    source.slice(source.indexOf("function ignoredCommentMarkerText"), source.indexOf("function normalCommentAuthorContainsUsername")) +
+    source.slice(source.indexOf("function ownCommentNode"), source.indexOf("const borneoOriginalContents")),
+    ignoredContext
+);
+
+function ignoredFixture({ text = "", header, content, explicit = false, nestedHeader } = {}) {
+    const comment = {
+        textContent: text,
+        matches: () => explicit,
+        querySelectorAll: selector => {
+            const nodes = selector === ".comment__header" ? [header, nestedHeader] : [content];
+            return nodes.filter(Boolean);
+        },
+        cloneNode: () => ({ textContent: text, querySelectorAll: () => [] })
+    };
+    if (header) header.closest = () => comment;
+    if (content) content.closest = () => comment;
+    if (nestedHeader) nestedHeader.closest = () => ({});
+    return comment;
+}
+
+test("quoted ignored-user notices in authored comments never hide the post or cache its author", () => {
+    const text = 'Dodatek usuwa komunikaty „Komentarz użytkownika Comentateiro, którego ignorujesz”.';
+    for (const fixture of [
+        { text, content: { textContent: text } },
+        { text, header: { textContent: "PeRRy dzisiaj" }, content: { textContent: text } },
+        { text: "Komentarz użytkownika Test, którego ignorujesz", content: { textContent: text } }
+    ]) {
+        const comment = ignoredFixture(fixture);
+        assert.equal(ignoredContext.isSiteIgnoredComment(comment), false);
+        assert.equal(ignoredContext.ignoredUsernameFromCommentText(comment), "");
+    }
+});
+
+test("real ignored-user placeholders still match with or without a header", () => {
+    const text = "Komentarz użytkownika Comentateiro, którego ignorujesz. Pokaż treść";
+    for (const fixture of [{ text }, { text, header: { textContent: text } }, { text, explicit: true }]) {
+        const comment = ignoredFixture(fixture);
+        assert.equal(ignoredContext.isSiteIgnoredComment(comment), true);
+        assert.equal(ignoredContext.ignoredUsernameFromCommentText(comment), "comentateiro");
+    }
+});
+
+test("an ignored notice in a nested reply does not classify the parent as ignored", () => {
+    const comment = ignoredFixture({
+        text: "Parent comment",
+        content: { textContent: "Parent comment" },
+        nestedHeader: { textContent: "Komentarz użytkownika Test, którego ignorujesz" }
+    });
+    assert.equal(ignoredContext.isSiteIgnoredComment(comment), false);
+    assert.equal(ignoredContext.ignoredUsernameFromCommentText(comment), "");
+});

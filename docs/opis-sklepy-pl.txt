@@ -1,0 +1,24 @@
+La Rambla Cleaner ułatwia czytanie komentarzy na FCBarca.com i w sekcji La Rambla. Pozwala uporządkować widok według własnych preferencji.
+
+FUNKCJE
+
+• Ignorowani użytkownicy: usuwa z widoku komunikaty o komentarzach ignorowanych osób oraz ich wpisy w „Gorących dyskusjach”. Korzysta z ignorowania ustawionego na FCBarca.com.
+• Ukrywanie wzmianek: opcjonalnie ukrywa komentarze innych osób zawierające wzmianki o ignorowanych użytkownikach. Domyślnie wyłączone.
+• Kategorie komentarzy: automatycznie rozpoznaje tematy na podstawie słów i fraz w treści. Kategorie: polityka, transfery, football, plotki, inny sport, gry, technologia, film i muzyka. Brak dopasowania oznacza „inny”. Słowniki obejmują polskie znaki i frazy wielowyrazowe. Klasyfikacja może być nietrafiona.
+• Filtrowanie tematów: zaznaczone w menu kategorie są ukrywane. Wyłączenie wyświetlania kategorii wyłącza również ten filtr.
+• Ukrywanie komentarzy z X/Twittera: opcjonalnie ukrywa cały komentarz zawierający osadzony post lub link do konkretnego posta, razem z dopisanym tekstem. Można włączyć i wyłączyć bez odświeżania strony. Domyślnie wyłączone.
+• Borneo Tłumacz: przy komentarzach użytkownika Borneo dodaje przycisk „Przetłumacz”. Kliknięcie uruchamia korektę polskiej pisowni, gramatyki i interpunkcji. Poprawiony tekst zastępuje oryginał, zachowując klikalne wzmianki i linki. To korekta językowa, a nie tłumaczenie na inny język. AI może się pomylić. Funkcja jest domyślnie włączona; wyłączenie usuwa przyciski i przywraca oryginalny tekst.
+
+OBSŁUGA
+
+Kliknij ikonę dodatku z herbem Barcelony, aby otworzyć menu. Ustawienia są zapamiętywane. Filtrowanie działa również na komentarzach doładowywanych podczas przeglądania. Mniejsze etykiety kategorii oraz przyciski „Przetłumacz” i „Przetłumaczono” są wyrównane do nagłówka komentarza.
+
+Dodatek zmienia wyłącznie Twój widok. Nie usuwa komentarzy z FCBarca.com i nie zmienia widoku innych osób.
+
+PRZETWARZANIE TEKSTU
+
+Korekta Borneo wysyła treść komentarza do usługi AI dopiero po kliknięciu przycisku. Gotowe korekty są przechowywane we wspólnej bazie, aby nie przetwarzać ponownie tego samego komentarza. Pozostałe filtry działają lokalnie w przeglądarce.
+
+OSTATNIE ZMIANY
+
+Dodano filtr całych komentarzy z X, rozszerzono słowniki kategorii — szczególnie polityki — poprawiono wygląd nagłówków i polskie znaki oraz dodano ikonę herbu Barcelony. Naprawiono również błąd, przez który cytowanie komunikatu o ignorowanym użytkowniku mogło ukryć zwykły komentarz.

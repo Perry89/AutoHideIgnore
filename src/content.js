@@ -300,15 +300,27 @@ function commentAuthorScope(comment) {
     return comment.querySelector(".comment__header, .comment__meta, .comment__author") || commentAuthor(comment);
 }
 
+function ignoredCommentMarkerText(comment) {
+    // An authored comment can quote the site's ignored-user notice verbatim.
+    // Read only its own header; never infer ignore state from message/reply text.
+    const header = ownCommentNode(comment, ".comment__header");
+    if (header) return normalize(header.textContent || "").trim();
+    if (ownCommentNode(comment, ".comment__content")) return "";
+    // Some site placeholders are bare cards without a header or content wrapper.
+    const copy = comment.cloneNode(true);
+    copy.querySelectorAll(".comment, .comment__content").forEach(node => node.remove());
+    return normalize(copy.textContent || "").trim();
+}
+
 function isSiteIgnoredComment(comment) {
-    const markerText = normalize(comment.querySelector(".comment__header")?.textContent || comment.textContent || "");
-    return comment.matches(SITE_IGNORED_COMMENT_SELECTOR) ||
-        (markerText.includes("komentarz uzytkownika") && markerText.includes("ktorego ignorujesz"));
+    if (comment.matches(SITE_IGNORED_COMMENT_SELECTOR)) return true;
+    return /^komentarz uzytkownika\s+.+?[,]?\s+ktorego ignorujesz\b/.test(ignoredCommentMarkerText(comment));
 }
 
 function ignoredUsernameFromCommentText(comment) {
-    const text = normalize(comment.textContent || "");
-    const match = text.match(/komentarz uzytkownika\s+([^,.\n]+?)\s*,?\s+ktorego ignorujesz/);
+    if (!isSiteIgnoredComment(comment)) return "";
+    const match = ignoredCommentMarkerText(comment)
+        .match(/^komentarz uzytkownika\s+([^,.\n]+?)\s*,?\s+ktorego ignorujesz/);
     return match ? normalizeUsername(match[1]) : "";
 }
 
