@@ -1,4 +1,4 @@
-Mała aktualizacja La Rambla Cleaner 🙂 Zebrałem w jednym miejscu wszystkie funkcje dodatku, z porównaniami widoku przed włączeniem i po włączeniu poszczególnych opcji.
+Mała aktualizacja La Rambla Cleaner 🙂 Dodałem do swojej lokalnej wersji nową funkcję, więc postanowiłem podzielić się nią również z resztą użytkowników. Zebrałem w jednym miejscu wszystkie funkcje dodatku, z porównaniami widoku przed włączeniem i po włączeniu poszczególnych opcji.
 
 Co zmieniło się względem poprzedniej wersji (Chrome 2.4.2 / Firefox 2.4.3)?
 Nowe wydania: Chrome 2.4.4 i Firefox 2.4.5.
@@ -12,8 +12,8 @@ Nowe wydania: Chrome 2.4.4 i Firefox 2.4.5.
 Ignorowanie użytkowników, ukrywanie wzmianek i korekta Borneo były już dostępne wcześniej. Poniżej pełny opis wszystkich funkcji oraz aktualne porównania zrzutów.
 
 1. Ignorowani użytkownicy naprawdę znikają z widoku
-Dodatek usuwa również komunikaty „Komentarz użytkownika…, którego ignorujesz”, dzięki czemu nie zostają po nich puste przerywniki. Ukrywa też wpisy ignorowanych osób w „Gorących dyskusjach”. Korzysta z ignorowania ustawionego na FCBarca.com — nie trzeba tworzyć drugiej listy.
-To podstawowe działanie dodatku, bez osobnego przełącznika w jego menu. Na porównaniu z głównej La Rambli: wpis Comentateiro przy wyłączonym i włączonym dodatku. Sąsiednie dyskusje pozostają na liście.
+Dodatek usuwa również komunikaty informujące o wpisach ignorowanych użytkowników, dzięki czemu nie zostają po nich puste przerywniki. Ukrywa też wpisy ignorowanych osób w „Gorących dyskusjach”. Korzysta z ignorowania ustawionego na FCBarca.com — nie trzeba tworzyć drugiej listy.
+To podstawowe działanie dodatku, bez osobnego przełącznika w jego menu. Na porównaniu z głównej La Rambli: wpis ignorowanego użytkownika przy wyłączonym i włączonym dodatku. Sąsiednie dyskusje pozostają na liście.
 https://zapodaj.net/images/7050f386b2cc5.png
 
 2. Ukrywanie wzmianek o ignorowanych
@@ -34,7 +34,7 @@ Po włączeniu „Borneo Tłumacz” obok komentarzy Borneo pojawia się przycis
 Włączona i wyłączona funkcja:
 https://zapodaj.net/images/936c9fdd92b29.png
 
-Ten sam komentarz z 3 listopada przed kliknięciem i po korekcie. Widać m.in. poprawki „idpoczynek” → „odpoczynek”, „jskby” → „jakby” i „ppwinien” → „powinien”, a także poprawioną interpunkcję i polskie znaki:
+Na załączonym zrzucie ekranu widać porównanie posta z błędami i po korekcie:
 https://zapodaj.net/images/f3462ea6f6531.png
 
 Tekst trafia do usługi AI dopiero po kliknięciu. Gotowe korekty są zapamiętywane we wspólnej bazie, żeby nie przetwarzać ponownie tego samego komentarza. Wyłączenie funkcji usuwa przyciski i przywraca oryginalny tekst. Tłumacz jest domyślnie włączony i działa również przy odpowiedziach oraz doładowanych komentarzach.
@@ -49,3 +49,9 @@ Ustawienia znajdziesz po kliknięciu ikony dodatku z herbem Barcelony na pasku p
 
 Tak wygląda menu:
 https://zapodaj.net/images/8d63b7f3113c8.png
+
+Dzięki wszystkim, którzy korzystają z dodatku i ocenili go w Chrome Web Store oraz Firefox Add-ons — doceniam! 🙂
+
+Obie wersje zostały już wysłane i czekają na weryfikację. Z mojego doświadczenia Firefox zwykle robi to w około 15 minut, a Chrome w około 2 godziny, więc liczę, że za mniej więcej 3 godziny najnowsza wersja będzie już dostępna dla wszystkich. Weryfikacja i automatyczna aktualizacja mogą jednak potrwać dłużej.
+
+Jeśli macie jeszcze jakieś pomysły lub opinie na temat wtyczki, chętnie posłucham!

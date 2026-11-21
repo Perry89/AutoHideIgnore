@@ -1,0 +1,5 @@
+Chrome 2.4.6 / Firefox 2.4.7
+
+Naprawiono błędne ukrywanie zwykłych komentarzy cytujących komunikat o ignorowanym użytkowniku. Dodatek odróżnia teraz komunikat strony od treści komentarza i odpowiedzi. Zapobiega to również błędnemu dopisywaniu autora takiego wpisu do lokalnej pamięci ignorowanych użytkowników.
+
+Wydanie zawiera też filtr całych komentarzy z X, rozszerzone słowniki kategorii, kompaktowe nagłówki z poprawnymi polskimi znakami i ikonę herbu Barcelony.

@@ -44,3 +44,9 @@ Etykiety kategorii i przyciski „Przetłumacz” / „Przetłumaczono” mają 
 W porównaniu z Chrome 2.4.2 / Firefox 2.4.3 dodano ukrywanie całych komentarzy z postami z X, rozszerzono słowniki kategorii (szczególnie polityki) i obsługę fraz wielowyrazowych, wyłączono dopasowywanie nicków i URL-i, zmniejszono oraz wyrównano etykiety i przyciski tłumacza, poprawiono polskie znaki i dodano ikonę herbu Barcelony. Usunięto też zbędne przepisywanie niezmienionych etykiet.
 
 Gałęzie `chrome-store` i `firefox-store` zachowują osobne domyślne pliki `manifest.json` i wersje pakietu. Gotowy polski wpis z opisem zmian i linkami do porównań znajduje się w [docs/post-na-la-ramble.txt](docs/post-na-la-ramble.txt).
+
+## Poprawka Chrome 2.4.6 / Firefox 2.4.7
+
+Naprawiono rozpoznawanie ignorowanych komentarzy: cytat komunikatu strony w zwykłym wpisie nie ukrywa już autora ani całej dyskusji. Wykrywanie opiera się na oznaczeniu lub własnym nagłówku komunikatu strony i pomija treść komentarza oraz zagnieżdżone odpowiedzi. Testy obejmują cytaty, rzeczywiste komunikaty i odpowiedzi.
+
+Aktualny polski opis do obu sklepów: [docs/opis-sklepy-pl.txt](docs/opis-sklepy-pl.txt). Informacja o poprawce: [docs/zmiany-2.4.6-2.4.7-pl.txt](docs/zmiany-2.4.6-2.4.7-pl.txt).
