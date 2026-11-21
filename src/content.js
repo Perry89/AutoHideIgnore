@@ -2,6 +2,7 @@ const isFirefox = typeof browser !== "undefined";
 const ext = isFirefox ? browser : chrome;
 
 const STORAGE_KEYS = {
+    hideXPostsEnabled: "hideXPostsEnabled",
     borneoTranslatorEnabled: "borneoTranslatorEnabled",
     categories: "ignoredCategories",
     categorizationEnabled: "categorizationEnabled",
@@ -58,21 +59,31 @@ const thresholds = {
 
 const categories = {
     polityka: [
-        "pis", "po", "ko", "kpo", "wybor", "rzad", "ue", "unia", "bruksela",
-        "platform", "obywatelsk", "konfederacj", "lewica", "psl", "kukiz",
-        "holown", "trzeciadrog", "trzecdrog", "trump", "putin", "biden",
-        "obama", "zelensk", "orban", "polityk", "sejm", "senat", "prezydent",
-        "minister", "premier", "parti", "opozycj", "koalicj", "parlament",
-        "ustaw", "glosowan", "posel", "senator", "kampan", "demokracj",
-        "praworzadn", "trybunal", "sad", "konstytucj", "podat", "budzet",
-        "inflacj", "gospodark", "nato", "wojn", "sankcj", "dyplomacj",
-        "imigracj", "uchodzc", "granica", "bezpieczenstw", "prawic",
-        "lewactw", "liberal", "konserwat", "ideologi", "propagand",
-        "narracj", "republik", "tvp", "tvn", "media", "dziennikarz",
-        "owsiak", "kaczynsk", "tusk", "morawieck", "dud", "ziobr", "bosak",
-        "mentzen", "trzaskowsk", "nawrock", "protest", "strajk",
-        "manifestacj", "marsz", "wyrok", "hejt", "atak", "podzial",
-        "spoleczenstw", "polaryzacj", "wosp", "fundacj", "zbiork"
+        "pis", "ko", "kpo", "ue", "usa", "onz", "nato", "tk", "tsue", "sn", "nsa",
+        "wybor", "rzad", "unia europejska", "bruksela", "platform", "obywatelsk",
+        "konfederacj", "lewic", "psl", "kukiz", "holown", "trzecia droga", "polska 2050",
+        "razem", "korona polska", "nowa nadzieja", "republikan", "demokrat",
+        "trump", "putin", "biden", "obama", "zelensk", "orban", "medwiediew", "medvedev",
+        "netanjahu", "netanyahu", "nataniahu", "lukaszenk", "macron", "merz", "scholz",
+        "polityk", "politycz", "sejm", "senat", "prezydent", "minister", "premier",
+        "posel", "poslow", "poslan", "senator", "parti", "opozycj", "koalicj", "parlament",
+        "ustaw", "glosowan", "referend", "kampania wyborcza", "demokracj", "autokracj",
+        "praworzadn", "trybunal", "konstytucj", "wet", "immunitet", "prokuratur",
+        "sadown", "sedziowie tk", "neosedz", "krs", "nominacje sedziowskie", "ordynacj",
+        "podat", "budzet panstwa", "deficyt", "inflacj", "akcyz", "vat", "pit", "cit",
+        "nbp", "rpp", "glapinsk", "stopy procentowe", "skarbu panstwa", "samorzad",
+        "wojn", "zbrojen", "wojsk", "sankcj", "dyplomacj", "ambasador", "kreml",
+        "rosj", "ukrain", "iran", "izrael", "palestyn", "gaza", "hamas", "hezbollah",
+        "imigracj", "migracj", "uchodzc", "deportacj", "prawic", "lewactw",
+        "liberal", "konserwat", "ideologi", "propagand", "nacjonal", "faszy",
+        "komuniz", "komunist", "socjaliz", "geopolity", "suwerenn",
+        "kaczynsk", "tusk", "morawieck", "duda", "dudy", "dudzie", "ziobr", "bosak",
+        "mentzen", "trzaskowsk", "nawrock", "braun", "korwin", "macierewicz",
+        "pawlowicz", "piotrowicz", "swieczkowsk", "przylebsk", "czarzast", "zandberg",
+        "biedron", "kosiniak", "kamysz", "sikorsk", "kierwinsk", "zurek", "sakiewicz",
+        "protest", "strajk", "manifestacj", "polaryzacj", "dekomunizacj", "cenzur",
+        "prawa czlowieka", "prawa kobiet", "aborcj", "lgbt", "zwiazki partnerskie",
+        "nord stream", "zielony lad", "pakt migracyjny", "fundusz spojnosci", "ets"
     ],
     transfery: [
         "transfer", "kontrakt", "kup", "sprzed", "wypozycz", "okno",
@@ -83,7 +94,8 @@ const categories = {
         "agent", "odejsc", "przejsc", "dolacz", "wrac", "zostaj",
         "przedluz", "rejestracj", "zgloszen", "wzmocn", "zakup", "sprzedaz",
         "wypozyczen", "wolnyagent", "freeagent", "deadline", "mercato",
-        "fabrizio", "romano"
+        "fabrizio", "romano",
+        "wolny agent", "free agent", "opcje wykupu", "opcja wykupu", "here we go", "salary cap", "posrednik", "odstepn", "prowizj", "amortyzacj", "deco", "laporta", "comunicado oficial"
     ],
     football: [
         "mecz", "gol", "asyst", "wynik", "bramk", "strzel", "wygran",
@@ -102,13 +114,15 @@ const categories = {
         "roma", "legia", "lech", "wisla", "rakow", "pogon", "messi",
         "ronaldo", "mbappe", "haaland", "vinicius", "bellingham", "neymar",
         "modric", "kane", "salah", "debruyne", "guardiol", "ancelotti",
-        "klopp", "mourinho", "xavi", "arteta", "tenhag", "tuchel", "flick"
+        "klopp", "mourinho", "xavi", "arteta", "tenhag", "tuchel", "flick",
+        "kounde", "cubarsi", "balde", "olmo", "fermin", "szczesn", "ter stegen", "cancelo", "rashford", "dani alves", "superpuchar", "ekstraklas", "dogrywk", "dwumecz", "el clasico", "rzut karny", "liga mistrzow", "liga europy", "czyste konto", "de jong", "real madryt", "premier league", "serie a"
     ],
     plotki: [
         "plotk", "media", "donies", "poglosk", "info", "zrodl", "twitter",
         "xcom", "przeciek", "spekulacj", "rumor", "insider", "leak",
         "nieoficjaln", "wedlug", "podobno", "rzekom", "sensacj", "temat",
-        "drama"
+        "drama",
+        "dement", "potwierdzone zrodlo", "niepotwierdzon", "spekuluj", "rewelacj", "sensacyj"
     ],
     inny_sport: [
         "nba", "koszyk", "siatkowk", "tenis", "atp", "wta", "f1", "formula",
@@ -120,7 +134,8 @@ const categories = {
         "taekwondo", "plywan", "wioslarstw", "zeglarstw", "kajak",
         "kolarstw", "tour", "tdf", "zawody", "turniej", "final", "medal",
         "rekord", "kwalifikacj", "ranking", "motorsport", "dakar", "nascar",
-        "padel", "snooker", "darts"
+        "padel", "snooker", "darts",
+        "swiatek", "sabalenk", "hurkacz", "djokovic", "alcaraz", "sinner", "wimbledon", "roland garros", "grand slam", "verstappen", "hamilton", "norris", "leclerc", "grand prix", "paddock", "pit stop", "bolid", "sety", "tie-break", "zagryw", "rozgrywajacy", "trojskok", "diamentowa liga", "us open", "australian open"
     ],
     gry: [
         "gra", "gry", "gaming", "zapis", "save", "savegame", "checkpoint",
@@ -137,7 +152,8 @@ const categories = {
         "league", "legends", "dota", "singleplayer", "multiplayer", "coop",
         "online", "ranked", "matchmaking", "grindow", "farm", "noob", "pro",
         "meta", "nerf", "buff", "grafik", "rozdzielcz", "optymalizacj",
-        "lag", "ping", "dlc", "earlyaccess", "gamepass", "esport", "streamer"
+        "lag", "ping", "dlc", "earlyaccess", "gamepass", "esport", "streamer",
+        "wiedzmin", "baldur", "hollow knight", "silksong", "clair obscur", "expedition 33", "hades", "god of war", "red dead", "hogwarts", "assassin", "battlefield", "counter strike", "helldivers", "demon souls", "game pass", "steam deck", "dual sense", "dualsense", "gameplay", "ray tracing", "trofeum", "osiagniecia"
     ],
     technologia: [
         "ai", "sztuczn", "inteligen", "chatgpt", "openai", "model", "llm",
@@ -151,7 +167,8 @@ const categories = {
         "cyberbezpieczenstw", "haker", "hack", "phishing", "vpn", "haslo",
         "cloud", "serwer", "hosting", "baza", "dane", "aktualizacj", "blad",
         "ios", "iphone", "samsung", "tesla", "crypto", "bitcoin", "blockchain",
-        "startup", "saas", "devops", "docker", "kubernetes", "git", "release"
+        "startup", "saas", "devops", "docker", "kubernetes", "git", "release",
+        "gemini", "claude", "copilot", "deepseek", "grok", "perplexity", "sztuczna inteligencja", "uczenie maszynowe", "prompt", "token", "geforce", "radeon", "ryzen", "intel", "nvidia", "snapdragon", "bluetooth", "wi-fi", "router", "swiatlowod", "oled", "usb", "hdmi", "powerbank", "smartwatch", "prywatnosc", "szyfrowan", "rozszerzen", "wtyczk"
     ],
     film: [
         "film", "serial", "odcink", "sezon", "kino", "netflix", "hbo",
@@ -161,7 +178,8 @@ const categories = {
         "scifi", "marvel", "dc", "starwars", "lotr", "ocen", "recenzj",
         "opini", "rating", "oglada", "obejrz", "watch", "stream", "boxoffice",
         "produkcj", "oscary", "emmy", "kanal", "showrunner", "spin-off",
-        "adaptacj", "dubbing", "lektor"
+        "adaptacj", "dubbing", "lektor",
+        "max", "skyshowtime", "canal+", "vod", "miniserial", "filmograf", "kinematograf", "scenariusz", "scenopis", "oscar", "zlote globy", "cannes", "villeneuve", "nolan", "tarantino", "scorsese", "diuna", "breaking bad", "better call saul", "gra o tron", "wladca pierscieni", "mroczny rycerz"
     ],
     muzyka: [
         "muzyk", "piosenk", "album", "singl", "koncert", "artyst", "teledysk",
@@ -170,7 +188,8 @@ const categories = {
         "produkcj", "mix", "master", "trasa", "tour", "festival", "festiwal",
         "refren", "zwrotk", "tekst", "feat", "collab", "drop", "hit", "wokal",
         "instrument", "gitara", "perkusj", "pianin", "playlist", "vinyl",
-        "winyl", "dj", "remix", "sample", "epka", "label", "wytworn"
+        "winyl", "dj", "remix", "sample", "epka", "label", "wytworn",
+        "sluchaw", "slucham", "sluchac", "utwor", "plyta", "plyty", "dyskograf", "kompozyt", "spiew", "brzmien", "melodi", "gitarzyst", "basist", "open er", "opener", "eurowizj", "grammy", "sanah", "podsiadlo", "kwiat jabloni", "taco", "quebonafide", "kendrick", "eminem", "metallica", "radiohead", "linkin park"
     ]
 };
 
@@ -449,8 +468,10 @@ function removeIgnoredComments() {
 }
 
 function categorizeText(text) {
-    const normalized = normalize(text);
+    // Ignore links and mentions: classify the message, not a username or URL.
+    const normalized = normalize(text).replace(/https?:\/\/\S+|www\.\S+|@[\w.-]+/g, " ");
     const words = normalized.replace(/[^\w\s-]/g, " ").split(/\s+/).filter(Boolean);
+    const sentence = ` ${words.join(" ")} `;
     let bestCategory = "inny";
     let bestScore = 0;
 
@@ -459,7 +480,9 @@ function categorizeText(text) {
         const uniqueKeywords = new Set(categories[category].map(normalize));
 
         uniqueKeywords.forEach(keyword => {
-            const matched = keyword.length <= 3
+            const matched = keyword.includes(" ")
+                ? sentence.includes(` ${keyword} `)
+                : keyword.length <= 3
                 ? words.includes(keyword)
                 : words.some(word => word.startsWith(keyword));
 
@@ -491,12 +514,10 @@ function addCategoryLabel(comment, category) {
     const meta = comment.querySelector(".comment__meta");
     if (!meta || meta.querySelector(".la-rambla-cleaner-category-label")) return;
 
-    const label = document.createElement("div");
+    const label = document.createElement("span");
     label.className = "la-rambla-cleaner-category-label";
     label.textContent = category;
-    label.style.marginLeft = "10px";
-    label.style.fontWeight = "bold";
-    label.style.color = "#a21d3d";
+    meta.classList.add("la-rambla-cleaner-meta");
 
     const links = meta.querySelector(".links");
     if (links?.parentNode) {
@@ -548,6 +569,28 @@ function ownCommentNode(comment, selector) {
 }
 
 const borneoOriginalContents = new WeakMap();
+
+function hasXPost(comment) {
+    const selectors = [
+        ".twitter-tweet", ".twitter-tweet-rendered", "twitter-widget",
+        'iframe[src^="https://platform.twitter.com/embed/"]',
+        'iframe[src^="https://platform.x.com/embed/"]'
+    ].join(",");
+    // A post in a nested reply must not hide the parent comment.
+    if (ownCommentNode(comment, selectors)) return true;
+    // Firefox can replace the widget markup with its tracking-protection placeholder.
+    // The post's permalink remains available, including before the widget loads.
+    return Array.from(comment.querySelectorAll("a[href]")).some(link => {
+        if (link.closest(".comment") !== comment) return false;
+        try {
+            const url = new URL(link.getAttribute("href"), "https://www.fcbarca.com");
+            return /^(www\.|mobile\.)?(twitter\.com|x\.com)$/i.test(url.hostname) &&
+                /^\/(?:[^/]+\/status|i\/web\/status)\/\d+(?:\/|$)/.test(url.pathname);
+        } catch {
+            return false;
+        }
+    });
+}
 
 function renderBorneoCorrection(content, translation) {
     const originalLinks = new Map();
@@ -617,18 +660,11 @@ function updateBorneoTranslator(comment, enabled) {
 
     const panel = document.createElement("div");
     panel.className = "borneo-translator";
-    Object.assign(panel.style, {
-        display: "inline-flex", alignItems: "center", gap: "6px", marginLeft: "10px"
-    });
+
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = "Przetlumacz";
+    button.textContent = "Przetłumacz";
     button.className = "button button--small";
-    Object.assign(button.style, {
-        cursor: "pointer", color: "#a21d3d", background: "transparent",
-        border: "1px solid currentColor", borderRadius: "3px", padding: "4px 8px",
-        font: "inherit"
-    });
     const output = document.createElement("div");
     output.setAttribute("role", "status");
     output.setAttribute("aria-live", "polite");
@@ -638,6 +674,7 @@ function updateBorneoTranslator(comment, enabled) {
     // Place the controls beside the category in this comment's header.
     const meta = ownCommentNode(comment, ".comment__meta");
     if (!meta) return;
+    meta.classList.add("la-rambla-cleaner-meta");
     const category = meta.querySelector(".la-rambla-cleaner-category-label");
     const links = meta.querySelector(".links");
     if (category) category.after(panel);
@@ -677,16 +714,21 @@ async function processComments() {
         updateIgnoredUsersFromDOM();
         removeIgnoredComments();
 
-        const [enabled, mentionEnabled, ignoredCategories, borneoEnabled] = await Promise.all([
+        const [enabled, mentionEnabled, ignoredCategories, borneoEnabled, hideXPosts] = await Promise.all([
             getCategorizationEnabled(),
             getMentionIgnoreEnabled(),
             getIgnoredCategories(),
-            storageGet(STORAGE_KEYS.borneoTranslatorEnabled, true)
+            storageGet(STORAGE_KEYS.borneoTranslatorEnabled, true),
+            storageGet(STORAGE_KEYS.hideXPostsEnabled, false)
         ]);
 
         const comments = document.querySelectorAll(".comment");
 
         comments.forEach(comment => {
+            if (hideXPosts && hasXPost(comment)) {
+                comment.style.display = "none";
+                return;
+            }
             updateBorneoTranslator(comment, borneoEnabled);
             const content = commentContent(comment);
             if (!content) return;
@@ -707,7 +749,7 @@ async function processComments() {
 
             const label = comment.querySelector(".la-rambla-cleaner-category-label");
             if (label) {
-                label.textContent = category;
+                if (label.textContent !== category) label.textContent = category;
             } else {
                 addCategoryLabel(comment, category);
             }
@@ -734,7 +776,7 @@ if (document.readyState === "loading") {
 }
 
 ext.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && changes.borneoTranslatorEnabled) processComments();
+    if (area === "local" && (changes.borneoTranslatorEnabled || changes.hideXPostsEnabled)) processComments();
 });
 
 ext.runtime.onMessage.addListener(msg => {

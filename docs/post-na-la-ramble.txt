@@ -1,0 +1,51 @@
+Mała aktualizacja La Rambla Cleaner 🙂 Zebrałem w jednym miejscu wszystkie funkcje dodatku, z porównaniami widoku przed włączeniem i po włączeniu poszczególnych opcji.
+
+Co zmieniło się względem poprzedniej wersji (Chrome 2.4.2 / Firefox 2.4.3)?
+Nowe wydania: Chrome 2.4.4 i Firefox 2.4.5.
+
+• NOWA opcja „Ukryj komentarze z postami z X” — usuwa z widoku cały komentarz z postem z X/Twittera, razem z dopisanym tekstem. Można ją włączać i wyłączać w menu, bez odświeżania strony.
+• Rozszerzone słowniki wszystkich kategorii, szczególnie polityki: więcej nazwisk, partii, instytucji oraz haseł dotyczących praworządności, gospodarki i spraw międzynarodowych. Dodano rozpoznawanie fraz wielowyrazowych i pomijanie nicków oraz adresów URL. Usunięto część zbyt ogólnych haseł politycznych, które powodowały pomyłki z piłką nożną.
+• Mniejsze etykiety kategorii oraz przyciski „Przetłumacz” i „Przetłumaczono”, wyrównane z nickiem i datą. Poprawiono polskie znaki w przycisku i menu.
+• Herb Barcelony jako ikona dodatku na pasku przeglądarki i na liście rozszerzeń.
+• Poprawka odświeżania etykiet — dodatek nie przepisuje już bez potrzeby niezmienionej kategorii.
+
+Ignorowanie użytkowników, ukrywanie wzmianek i korekta Borneo były już dostępne wcześniej. Poniżej pełny opis wszystkich funkcji oraz aktualne porównania zrzutów.
+
+1. Ignorowani użytkownicy naprawdę znikają z widoku
+Dodatek usuwa również komunikaty „Komentarz użytkownika…, którego ignorujesz”, dzięki czemu nie zostają po nich puste przerywniki. Ukrywa też wpisy ignorowanych osób w „Gorących dyskusjach”. Korzysta z ignorowania ustawionego na FCBarca.com — nie trzeba tworzyć drugiej listy.
+To podstawowe działanie dodatku, bez osobnego przełącznika w jego menu. Na porównaniu z głównej La Rambli: wpis Comentateiro przy wyłączonym i włączonym dodatku. Sąsiednie dyskusje pozostają na liście.
+https://zapodaj.net/images/7050f386b2cc5.png
+
+2. Ukrywanie wzmianek o ignorowanych
+Opcja „Ukryj mention ignorowanych” pozwala schować także komentarz innej osoby, jeżeli pojawia się w nim wzmianka @ o ignorowanym użytkowniku. Przydatne, gdy nie chcesz oglądać również dalszych rozmów na jego temat. Domyślnie ta opcja jest wyłączona.
+https://zapodaj.net/images/09ada22e37816.png
+
+3. Kategorie przy komentarzach
+Po włączeniu „Pokaż kategorie” przy komentarzach pojawiają się etykiety tematyczne: polityka, transfery, football, plotki, inny sport, gry, technologia, film i muzyka. Bez dopasowania jest „inny”. Kategorie są rozpoznawane automatycznie na podstawie słów w komentarzu, więc czasem mogą być nietrafione. Wyświetlanie kategorii można wyłączyć. Słownik został rozszerzony we wszystkich kategoriach, szczególnie w polityce — o kolejne nazwiska, partie, instytucje i tematy. Rozpoznawane są także frazy złożone z kilku słów; nicki i adresy linków nie decydują o kategorii. Etykiety są teraz mniejsze i wyrównane do reszty nagłówka.
+https://zapodaj.net/images/f531899e4470d.png
+
+4. Filtrowanie tematów
+W menu można zaznaczyć kategorie, których nie chcesz czytać. Zaznaczenie oznacza UKRYCIE komentarzy z danej kategorii. Wyłączenie „Pokaż kategorie” wyłącza również ten filtr. Na porównaniu znika wpis z kategorii „film” na głównej La Rambli. Dyskusje nad nim i pod nim pozostają widoczne.
+https://zapodaj.net/images/c599953476c72.png
+
+5. Tłumacz Borneo
+Po włączeniu „Borneo Tłumacz” obok komentarzy Borneo pojawia się przycisk „Przetłumacz”. Dopiero kliknięcie uruchamia korektę pisowni, gramatyki i interpunkcji. Poprawiona wersja zastępuje oryginał, a linki i wzmianki pozostają klikalne. To korekta polskiego tekstu, nie tłumaczenie na inny język. AI może się pomylić. Przyciski „Przetłumacz” i „Przetłumaczono” są mniejsze i stoją w jednej linii z nickiem, datą i kategorią.
+
+Włączona i wyłączona funkcja:
+https://zapodaj.net/images/936c9fdd92b29.png
+
+Ten sam komentarz z 3 listopada przed kliknięciem i po korekcie. Widać m.in. poprawki „idpoczynek” → „odpoczynek”, „jskby” → „jakby” i „ppwinien” → „powinien”, a także poprawioną interpunkcję i polskie znaki:
+https://zapodaj.net/images/f3462ea6f6531.png
+
+Tekst trafia do usługi AI dopiero po kliknięciu. Gotowe korekty są zapamiętywane we wspólnej bazie, żeby nie przetwarzać ponownie tego samego komentarza. Wyłączenie funkcji usuwa przyciski i przywraca oryginalny tekst. Tłumacz jest domyślnie włączony i działa również przy odpowiedziach oraz doładowanych komentarzach.
+
+6. NOWOŚĆ: ukrywanie całych komentarzy z postami z X
+Opcja „Ukryj komentarze z postami z X” chowa cały komentarz zawierający post z X/Twittera — razem z dopisanym tekstem, a nie tylko samą ramkę osadzenia. Rozpoznaje również linki prowadzące bezpośrednio do konkretnego posta. Działa też wtedy, gdy Firefox zastąpi osadzenie komunikatem o blokadzie.
+
+Zmiana działa bez odświeżania strony. Po odznaczeniu komentarze wracają, chyba że ukrywa je inny filtr. Opcja jest domyślnie wyłączona.
+https://zapodaj.net/images/759b412578738.png
+
+Ustawienia znajdziesz po kliknięciu ikony dodatku z herbem Barcelony na pasku przeglądarki. Wybrane opcje są zapamiętywane. Filtrowanie obejmuje również komentarze doładowywane podczas przeglądania. Wszystko zmienia tylko Twój widok — komentarze nie są usuwane z FCBarca.com. Dodatek jest przygotowany dla Chrome i Firefoksa.
+
+Tak wygląda menu:
+https://zapodaj.net/images/8d63b7f3113c8.png

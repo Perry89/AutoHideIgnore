@@ -10,7 +10,7 @@ config = json.loads(config_path.read_text()) if config_path.exists() else {"apiK
 for browser, suffix in [("chrome", "zip"), ("firefox", "xpi")]:
     destination = root / "dist" / browser
     destination.mkdir(parents=True, exist_ok=True)
-    for folder in ["src", "popup"]:
+    for folder in ["src", "popup", "icons"]:
         shutil.copytree(root / folder, destination / folder, dirs_exist_ok=True)
     manifest_path = root / ("manifest.firefox.json" if browser == "firefox" else "manifest.chrome.json")
     if not manifest_path.exists():
