@@ -1,6 +1,7 @@
-if (typeof importScripts === "function") importScripts("translation-config.js");
+if (typeof importScripts === "function") importScripts("translation-config.js", "keyword-cache.js");
 
 const api = typeof browser !== "undefined" ? browser : chrome;
+const getCategoryDictionary = globalThis.CategoryDictionary?.create({ storage: api.storage?.local, fetch: (...args) => fetch(...args) });
 const requests = new Map();
 let session;
 
@@ -42,6 +43,14 @@ async function translate(message) {
 }
 
 api.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === "getCategoryDictionary") {
+        if (!sender.tab || !/^https?:\/\/www\.fcbarca\.com\//.test(sender.url || "")) {
+            sendResponse({ error: "Invalid sender" });
+            return;
+        }
+        getCategoryDictionary().then(dictionary => sendResponse({ dictionary }), () => sendResponse({ dictionary: null }));
+        return true;
+    }
     if (message.type !== "translateBorneo") return;
     if (!sender.tab || !/^https?:\/\/www\.fcbarca\.com\//.test(sender.url || "") ||
         !/^comment-\d+$/.test(message.commentId || "") ||

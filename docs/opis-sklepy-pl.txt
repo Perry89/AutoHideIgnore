@@ -22,3 +22,7 @@ Korekta Borneo wysyła treść komentarza do usługi AI dopiero po kliknięciu p
 OSTATNIE ZMIANY
 
 Dodano filtr całych komentarzy z X, rozszerzono słowniki kategorii — szczególnie polityki — poprawiono wygląd nagłówków i polskie znaki oraz dodano ikonę herbu Barcelony. Naprawiono również błąd, przez który cytowanie komunikatu o ignorowanym użytkowniku mogło ukryć zwykły komentarz.
+
+AKTUALIZACJE SŁOWNIKÓW
+
+Słowniki kategorii są pobierane z Firebase i przechowywane lokalnie. Dodatek sprawdza aktualizacje najwyżej raz na 24 godziny w danym profilu przeglądarki, wspólnie dla wszystkich kart. Filtrowanie nadal odbywa się lokalnie, bez wysyłania treści komentarzy. Przy braku połączenia korzysta z ostatnich słowników lub wersji dołączonej do dodatku. Słowa związane z GTA należą do kategorii gry.

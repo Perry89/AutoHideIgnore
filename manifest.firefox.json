@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "La Rambla Cleaner",
   "description": "Hide ignored users and filter discussion categories on fcbarca.com.",
-  "version": "2.4.7",
+  "version": "2.4.9",
   "permissions": [
     "storage",
     "tabs"
@@ -10,7 +10,8 @@
   "host_permissions": [
     "*://www.fcbarca.com/*",
     "https://identitytoolkit.googleapis.com/*",
-    "https://*.cloudfunctions.net/*"
+    "https://*.cloudfunctions.net/*",
+    "https://firestore.googleapis.com/*"
   ],
   "action": {
     "default_popup": "popup/popup.html",
@@ -27,6 +28,7 @@
         "*://www.fcbarca.com/*"
       ],
       "js": [
+        "src/keyword-cache.js",
         "src/content.js"
       ],
       "run_at": "document_idle",
@@ -52,6 +54,7 @@
   "background": {
     "scripts": [
       "src/translation-config.js",
+      "src/keyword-cache.js",
       "src/background.js"
     ]
   },
